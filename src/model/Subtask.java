@@ -1,18 +1,28 @@
 package model;
 
+import model.constants.TaskStatuses;
+
 public class Subtask extends Task {
-//	private Epic epic;
+	private Epic epic;
 
-	public Subtask(String title, String description, Epic epic) {
-		super(title, description);
-	}
-
-	public Subtask(String title, String description, Epic epic, String status) {
+	public Subtask(String title, String description, Epic epic, TaskStatuses status) {
 		super(title, description, status);
+		this.epic = epic;
 	}
 
-	public Subtask(int id, String title, String description, String status) {
+	public Subtask(int id, String title, String description, Epic epic, TaskStatuses status) {
 		super(id, title, description, status);
+		this.epic = epic;
 	}
 
+	@Override
+	public String toString() {
+		return "SubTask{" +
+				"id=" + getId() +
+				", title='" + getTitle() + '\'' +
+				", status=" + getStatus() +
+				", description='" + getDescription() + '\'' +
+				", epicId=" + epic.getId() +
+				'}';
+	}
 }
