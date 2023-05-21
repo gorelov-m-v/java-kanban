@@ -1,5 +1,6 @@
 package model;
 
+import java.io.FilterOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,7 +8,7 @@ import java.util.stream.Collectors;
 public class Manager {
 	private final HashMap<Integer, Task> tasks = new HashMap<>();
 	private final HashMap<Integer, Epic> epics = new HashMap<>();
-	private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
+
 	private int i = 0;
 
 	private int getNewId() {
@@ -22,8 +23,8 @@ public class Manager {
 		return epics.values().stream().collect(Collectors.toList());
 	}
 
-	public List<Subtask> getAllSubtasks() {
-		return subtasks.values().stream().collect(Collectors.toList());
+	public List<Subtask> getAllSubtasks(Epic epic) {
+		return epic.getSubtasks();
 	}
 	// Удаление всех задач.
 	public void removeAllTasks() {
@@ -34,8 +35,8 @@ public class Manager {
 		epics.clear();
 	}
 
-	public void removeAllSubtasks() {
-		subtasks.clear();
+	public void removeAllSubtasks(Epic epic) {
+		epic.getSubtasks().clear();
 	}
 	// Получение по идентификатору.
 	public Task getTaskById(int id) {
@@ -47,7 +48,27 @@ public class Manager {
 	}
 
 	public Subtask getSubtaskById(int id) {
-		return  subtasks.get(id);
+		Subtask subtask = null;
+		for (Epic epic : epics.values()) {
+			for (Subtask sub : epic.getSubtasks()) {
+				if (sub.getId() == id) {
+					subtask = sub;
+				}
+			}
+		}
+		return subtask;
+	}
+
+	public Epic getEpicBySubtaskId(int subtaskId) {
+		Epic returnedEpic = null;
+		for (Epic epic : epics.values()) {
+			for ( Subtask subtask : epic.getSubtasks()) {
+				if (subtask.getId() == subtaskId) {
+					returnedEpic = epic;
+				}
+			}
+		}
+		return returnedEpic;
 	}
 	// Создание. Сам объект должен передаваться в качестве параметра.
 	public void createTask(Task task) {
@@ -60,9 +81,9 @@ public class Manager {
 		epics.put(epic.getId(), epic);
 	}
 
-	public void createSubtask(Subtask subtask) {
-		subtask.setId(getNewId());
-		subtasks.put(subtask.getId(), subtask);
+	public void createSubtask(Subtask subtaskData, Epic epic) {
+		Subtask newSubtask = new Subtask(getNewId(), subtaskData.getTitle(), subtaskData.getDescription(), subtaskData.getStatus());
+		epic.addSubtask(newSubtask);
 	}
 
 	// Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
@@ -74,9 +95,33 @@ public class Manager {
 		epics.put(epic.getId(), epic);
 	}
 
-	public void updateSubtask(Subtask subtask) {
-		subtasks.put(subtask.getId(), subtask);
+	public int getIndexBySubtaskId(int subtaskId) {
+		int index = -1;
+		Epic epic = getEpicBySubtaskId(subtaskId);
+		for (int i = 0; i < epic.getSubtasks().size(); i++) {
+			if (epic.getSubtasks().get(i).getId() == subtaskId)
+				index = i;
+		}
+		return index;
 	}
+
+	public void updateSubtask(int subtaskId, Subtask newSubtaskData) {
+		Subtask updatedSubtask = getSubtaskById(subtaskId);
+		updatedSubtask.setStatus(newSubtaskData.getStatus());
+		updatedSubtask.setTitle(newSubtaskData.getTitle());
+		updatedSubtask.setDescription(newSubtaskData.getDescription());
+
+		int epicId = getEpicBySubtaskId(subtaskId).getId();
+		epics.get(epicId).getSubtasks().remove(getIndexBySubtaskId(subtaskId));
+
+		epics.get(epicId).getSubtasks().add(updatedSubtask);
+
+		checkEpicStatus(getEpicBySubtaskId(subtaskId));
+	}
+
+
+
+
 
 	// Удаление по идентификатору.
 	public void removeTaskById(int id) {
@@ -88,12 +133,13 @@ public class Manager {
 	}
 
 	public void removeSubtaskById(int id) {
-		subtasks.remove(id);
+		int epicId = getEpicBySubtaskId(id).getId();
+		epics.get(epicId).getSubtasks().remove(getIndexBySubtaskId(id));
 	}
 
 	// Получение списка всех подзадач определённого эпика.
-	public List<Subtask> getAllSubtasksFromEpic(int epicId) {
-		return epics.get(epicId).getSubtasks();
+	public List<Subtask> getAllSubtasksFromEpic(Epic epic) {
+		return epics.get(epic.getId()).getSubtasks();
 	}
 
 	// Управление статусами.
