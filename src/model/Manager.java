@@ -17,11 +17,11 @@ public class Manager {
 	}
 
 	public List<Task> getAllTasks() {
-		return tasks.values().stream().collect(Collectors.toList());
+		return new ArrayList<>(tasks.values());
 	}
 
 	public List<Epic> getAllEpics() {
-		return epics.values().stream().collect(Collectors.toList());
+		return new ArrayList<>(epics.values());
 	}
 
 	public List<Subtask> getAllSubtasks() {
