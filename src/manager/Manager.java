@@ -1,15 +1,19 @@
-package model;
+package manager;
 
+import model.Epic;
+import model.Subtask;
+import model.Task;
 import model.constants.TaskStatuses;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Manager {
-	private final HashMap<Integer, Task> tasks = new HashMap<>();
-	private final HashMap<Integer, Epic> epics = new HashMap<>();
+	private final Map<Integer, Task> tasks = new HashMap<>();
+	private final Map<Integer, Epic> epics = new HashMap<>();
 	private int i = 0;
 
 	private int getNewId() {
@@ -26,6 +30,7 @@ public class Manager {
 
 	public List<Subtask> getAllSubtasks() {
 		List<Subtask> allSubTasks = new ArrayList<>();
+
 		for (Epic epic : epics.values()) {
 			allSubTasks = Stream.concat(allSubTasks.stream(), epic.getSubtasks().stream())
 					.collect(Collectors.toList());
@@ -57,6 +62,7 @@ public class Manager {
 
 	public Subtask getSubtaskById(int id) {
 		Subtask subtask = null;
+
 		for (Epic epic : epics.values()) {
 			for (Subtask sub : epic.getSubtasks()) {
 				if (sub.getId() == id) {
@@ -69,6 +75,7 @@ public class Manager {
 
 	private Epic getEpicBySubtaskId(int subtaskId) {
 		Epic returnedEpic = null;
+
 		for (Epic epic : epics.values()) {
 			for ( Subtask subtask : epic.getSubtasks()) {
 				if (subtask.getId() == subtaskId) {
@@ -90,12 +97,10 @@ public class Manager {
 		epics.put(epic.getId(), epic);
 	}
 
-	public void createSubtask(Subtask subtaskData, Epic epic) {
-		epic.addSubtask(new Subtask(getNewId(),
-				subtaskData.getTitle(),
-				subtaskData.getDescription(),
-				epic,
-				subtaskData.getStatus()));
+	public void createSubtask(Subtask subtask, Epic epic) {
+		subtask.setId(getNewId());
+
+		epic.addSubtask(subtask);
 	}
 
 	public void updateTask(Task task, String title, String description, TaskStatuses status) {
@@ -113,6 +118,7 @@ public class Manager {
 
 	private int getIndexBySubtaskId(int subtaskId) {
 		int index = Integer.MIN_VALUE;
+
 		Epic epic = getEpicBySubtaskId(subtaskId);
 		for (int i = 0; i < epic.getSubtasks().size(); i++) {
 			if (epic.getSubtasks().get(i).getId() == subtaskId)
@@ -122,15 +128,12 @@ public class Manager {
 	}
 
 	public void updateSubtask(int subtaskId, Subtask newSubtaskData) {
-		Subtask updatedSubtask = getSubtaskById(subtaskId);
-		updatedSubtask.setStatus(newSubtaskData.getStatus());
-		updatedSubtask.setTitle(newSubtaskData.getTitle());
-		updatedSubtask.setDescription(newSubtaskData.getDescription());
+		newSubtaskData.setId(subtaskId);
 
 		int epicId = getEpicBySubtaskId(subtaskId).getId();
 
 		epics.get(epicId).getSubtasks().remove(getIndexBySubtaskId(subtaskId));
-		epics.get(epicId).getSubtasks().add(updatedSubtask);
+		epics.get(epicId).getSubtasks().add(newSubtaskData);
 
 		checkEpicStatus(getEpicBySubtaskId(subtaskId));
 	}
