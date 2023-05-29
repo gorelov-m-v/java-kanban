@@ -29,13 +29,11 @@ public class Manager {
 	}
 
 	public List<Subtask> getAllSubtasks() {
-		List<Subtask> allSubTasks = new ArrayList<>();
-
-		for (Epic epic : epics.values()) {
-			allSubTasks = Stream.concat(allSubTasks.stream(), epic.getSubtasks().stream())
-					.collect(Collectors.toList());
-		}
-		return allSubTasks;
+		return epics.values()
+				.stream()
+				.map(Epic::getSubtasks)
+				.flatMap(List::stream)
+				.collect(Collectors.toList());
 	}
 
 	public void removeAllTasks() {
