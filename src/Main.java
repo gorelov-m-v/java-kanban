@@ -24,6 +24,7 @@ public class Main {
         System.out.println(manager.getAllEpics().get(0));
 
         System.out.println(manager.getAllSubtasks());
+        System.out.println(manager.getSubtaskById(2));
 
     }
 }

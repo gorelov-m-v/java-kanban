@@ -59,16 +59,13 @@ public class Manager {
 	}
 
 	public Subtask getSubtaskById(int id) {
-		Subtask subtask = null;
-
-		for (Epic epic : epics.values()) {
-			for (Subtask sub : epic.getSubtasks()) {
-				if (sub.getId() == id) {
-					subtask = sub;
-				}
-			}
-		}
-		return subtask;
+		return epics.values()
+				.stream()
+				.map(Epic::getSubtasks)
+				.flatMap(List::stream)
+				.filter(s -> s.getId() == id)
+				.findFirst()
+				.get();
 	}
 
 	private Epic getEpicBySubtaskId(int subtaskId) {
