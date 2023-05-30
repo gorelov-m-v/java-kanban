@@ -18,6 +18,10 @@ public class Epic extends Task {
 		subtasks.add(subtask);
 	}
 
+	public void removeSubtask(int id) {
+		subtasks.removeIf(s -> s.getId() == id);
+	}
+
 	@Override
 	public String toString() {
 		return "Epic{" +

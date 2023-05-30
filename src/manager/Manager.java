@@ -4,10 +4,8 @@ import model.Epic;
 import model.Subtask;
 import model.Task;
 import model.constants.TaskStatuses;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,9 +43,9 @@ public class Manager {
 	}
 
 	public void removeAllSubtasks() {
-		for (Epic epic : epics.values()) {
-			epic.getSubtasks().clear();
-		}
+		epics.values().stream()
+				.map(Epic::getSubtasks)
+				.forEach(List::clear);
 	}
 
 	public Task getTaskById(int id) {
@@ -65,7 +63,7 @@ public class Manager {
 				.flatMap(List::stream)
 				.filter(s -> s.getId() == id)
 				.findFirst()
-				.get();
+				.orElse(null);
 	}
 
 	private Epic getEpicBySubtaskId(int subtaskId) {
@@ -142,8 +140,9 @@ public class Manager {
 	}
 
 	public void removeSubtaskById(int id) {
-		int epicId = getEpicBySubtaskId(id).getId();
-		epics.get(epicId).getSubtasks().remove(getIndexBySubtaskId(id));
+		epics.values().stream()
+				.filter(s -> s.getSubtasks().contains(getSubtaskById(id)))
+				.forEach(e -> e.removeSubtask(id));
 	}
 
 	public List<Subtask> getAllSubtasksFromEpic(Epic epic) {
