@@ -66,18 +66,11 @@ public class Manager {
 				.orElse(null);
 	}
 
-	private Epic getEpicBySubtaskId(int subtaskId) {
-		Epic returnedEpic = null;
-
-		for (Epic epic : epics.values()) {
-			for ( Subtask subtask : epic.getSubtasks()) {
-				if (subtask.getId() == subtaskId) {
-					returnedEpic = epic;
-					break;
-				}
-			}
-		}
-		return returnedEpic;
+	public Epic getEpicBySubtaskId(int subtaskId) {
+		return epics.values().stream()
+				.filter(epic -> epic.getSubtasks().contains(getSubtaskById(subtaskId)))
+				.findFirst()
+				.orElse(null);
 	}
 
 	public void createTask(Task task) {

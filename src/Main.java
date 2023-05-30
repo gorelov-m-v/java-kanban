@@ -28,17 +28,18 @@ public class Main {
         System.out.println(manager.getAllEpics().get(0));
         manager.updateSubtask(2, new Subtask("Title", "Title", epic, TaskStatuses.DONE));
         System.out.println(manager.getSubtaskById(2));
+        System.out.println(manager.getEpicBySubtaskId(2));
 
-        manager.createEpic(epic2);
-
-        System.out.println(manager.getAllEpics().get(1));
-        manager.createSubtask(subtask3, epic2);
-        manager.createSubtask(subtask4, epic2);
-        manager.createSubtask(subtask5, epic2);
-        System.out.println(manager.getAllEpics().get(1));
-
-        manager.removeSubtaskById(3);
-        System.out.println(manager.getAllEpics().get(0));
+//        manager.createEpic(epic2);
+//
+//        System.out.println(manager.getAllEpics().get(1));
+//        manager.createSubtask(subtask3, epic2);
+//        manager.createSubtask(subtask4, epic2);
+//        manager.createSubtask(subtask5, epic2);
+//        System.out.println(manager.getAllEpics().get(1));
+//
+//        manager.removeSubtaskById(3);
+//        System.out.println(manager.getAllEpics().get(0));
 
 
 
