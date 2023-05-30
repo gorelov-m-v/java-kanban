@@ -26,8 +26,8 @@ public class Main {
         manager.createSubtask(subtask1, epic);
         manager.createSubtask(subtask2, epic);
         System.out.println(manager.getAllEpics().get(0));
-        manager.removeSubtaskById(2);
-
+        manager.updateSubtask(2, new Subtask("Title", "Title", epic, TaskStatuses.DONE));
+        System.out.println(manager.getSubtaskById(2));
 
         manager.createEpic(epic2);
 

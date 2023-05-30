@@ -109,23 +109,12 @@ public class Manager {
 		epics.put(epic.getId(), epic);
 	}
 
-	private int getIndexBySubtaskId(int subtaskId) {
-		int index = Integer.MIN_VALUE;
-
-		Epic epic = getEpicBySubtaskId(subtaskId);
-		for (int i = 0; i < epic.getSubtasks().size(); i++) {
-			if (epic.getSubtasks().get(i).getId() == subtaskId)
-				index = i;
-		}
-		return index;
-	}
-
 	public void updateSubtask(int subtaskId, Subtask newSubtaskData) {
 		newSubtaskData.setId(subtaskId);
 
 		int epicId = getEpicBySubtaskId(subtaskId).getId();
 
-		epics.get(epicId).getSubtasks().remove(getIndexBySubtaskId(subtaskId));
+		epics.get(epicId).removeSubtask(subtaskId);
 		epics.get(epicId).getSubtasks().add(newSubtaskData);
 
 		checkEpicStatus(getEpicBySubtaskId(subtaskId));
