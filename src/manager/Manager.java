@@ -14,10 +14,6 @@ public class Manager {
 	private final Map<Integer, Epic> epics = new HashMap<>();
 	private int i = 0;
 
-	private int getNewId() {
-		return ++i;
-	}
-
 	public List<Task> getAllTasks() {
 		return new ArrayList<>(tasks.values());
 	}
@@ -66,11 +62,8 @@ public class Manager {
 				.orElse(null);
 	}
 
-	public Epic getEpicBySubtaskId(int subtaskId) {
-		return epics.values().stream()
-				.filter(epic -> epic.getSubtasks().contains(getSubtaskById(subtaskId)))
-				.findFirst()
-				.orElse(null);
+	public List<Subtask> getAllSubtasksFromEpic(Epic epic) {
+		return epics.get(epic.getId()).getSubtasks();
 	}
 
 	public void createTask(Task task) {
@@ -127,10 +120,6 @@ public class Manager {
 				.forEach(e -> e.removeSubtask(id));
 	}
 
-	public List<Subtask> getAllSubtasksFromEpic(Epic epic) {
-		return epics.get(epic.getId()).getSubtasks();
-	}
-
 	private void checkEpicStatus(Epic epic) {
 		List<TaskStatuses> subtaskStatuses = epic.getSubtasks()
 				.stream()
@@ -147,5 +136,16 @@ public class Manager {
 		} else {
 			epic.setStatus(TaskStatuses.IN_PROGRESS);
 		}
+	}
+
+	private Epic getEpicBySubtaskId(int subtaskId) {
+		return epics.values().stream()
+				.filter(epic -> epic.getSubtasks().contains(getSubtaskById(subtaskId)))
+				.findFirst()
+				.orElse(null);
+	}
+
+	private int getNewId() {
+		return ++i;
 	}
 }
