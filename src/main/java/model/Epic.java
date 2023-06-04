@@ -1,11 +1,9 @@
 package model;
 
-import lombok.Getter;
-import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter @Setter
 public class Epic extends Task {
 	private List<Subtask> subtasks = new ArrayList<>();
 
@@ -19,6 +17,14 @@ public class Epic extends Task {
 
 	public void removeSubtask(int id) {
 		subtasks.removeIf(s -> s.getId() == id);
+	}
+
+	public List<Subtask> getSubtasks() {
+		return subtasks;
+	}
+
+	public void setSubtasks(List<Subtask> subtasks) {
+		this.subtasks = subtasks;
 	}
 
 	@Override

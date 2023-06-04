@@ -1,10 +1,7 @@
 package model;
 
-import lombok.Getter;
-import lombok.Setter;
 import model.constants.TaskStatuses;
 
-@Getter @Setter
 public class Subtask extends Task {
 	private final Epic epic;
 
@@ -18,6 +15,9 @@ public class Subtask extends Task {
 		this.epic = epic;
 	}
 
+	public Epic getEpic() {
+		return epic;
+	}
 	@Override
 	public String toString() {
 		return "SubTask{" +

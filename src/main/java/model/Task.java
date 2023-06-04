@@ -1,10 +1,7 @@
 package model;
 
-import lombok.Getter;
-import lombok.Setter;
 import model.constants.TaskStatuses;
 
-@Getter @Setter
 public class Task {
 	private int id;
 	private String title;
@@ -26,6 +23,38 @@ public class Task {
 		this.id = id;
 		this.title = title;
 		this.description = description;
+		this.status = status;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public TaskStatuses getStatus() {
+		return status;
+	}
+
+	public void setStatus(TaskStatuses status) {
 		this.status = status;
 	}
 
