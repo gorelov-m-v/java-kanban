@@ -1,7 +1,10 @@
 package model;
 
+import lombok.Getter;
+import lombok.Setter;
 import model.constants.TaskStatuses;
 
+@Getter @Setter
 public class Subtask extends Task {
 	private final Epic epic;
 

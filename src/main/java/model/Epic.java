@@ -1,17 +1,16 @@
 package model;
 
+import lombok.Getter;
+import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter @Setter
 public class Epic extends Task {
 	private List<Subtask> subtasks = new ArrayList<>();
 
 	public Epic(String title, String description) {
 		super(title, description);
-	}
-
-	public List<Subtask> getSubtasks() {
-		return subtasks;
 	}
 
 	public void addSubtask(Subtask subtask) {
