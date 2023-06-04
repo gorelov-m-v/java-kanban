@@ -32,7 +32,7 @@ public class Main {
 
         manager.getEpicById(1);
         manager.getSubtaskById(2);
-        manager.getSubtaskById(3);
+        manager.getSubtaskById(9);
         manager.getSubtaskById(4);
         manager.getTaskById(5);
 
