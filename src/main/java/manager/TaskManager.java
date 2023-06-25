@@ -5,21 +5,20 @@ import model.Subtask;
 import model.Task;
 import model.constants.TaskStatuses;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public interface TaskManager {
 
     public List<Task> getAllTasks();
-    public List<Epic> getAllEpics();
-    public List<Subtask> getAllSubtasks();
+    public List<Task> getAllEpics();
+    public List<Task> getAllSubtasks();
 
     public void removeAllTasks();
     public void removeAllEpics();
     public void removeAllSubtasks();
 
     public Task getTaskById(int id);
-    public Epic getEpicById(int id);
-    public Subtask getSubtaskById(int id);
+    public Task getEpicById(int id);
+    public Task getSubtaskById(int id);
 
     public List<Subtask> getAllSubtasksFromEpic(int epicId);
 
