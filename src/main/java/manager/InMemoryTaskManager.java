@@ -3,7 +3,7 @@ package manager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
-import model.constants.TaskStatuses;
+import model.constants.TaskStatus;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -114,7 +114,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(Task task, String title, String description, TaskStatuses status) {
+    public void updateTask(Task task, String title, String description, TaskStatus status) {
         task.setTitle(title);
         task.setDescription(description);
         task.setStatus(status);
@@ -142,7 +142,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTaskById(int id) {
-        historyManager.remove(id);
+        historyManager.removeById(id);
 
         tasks.remove(id);
     }
@@ -151,8 +151,8 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeEpicById(int id) {
         getAllSubtasksFromEpic(id).stream()
                 .map(Task::getId)
-                .forEach(subtaskId -> historyManager.remove(subtaskId));
-        historyManager.remove(id);
+                .forEach(subtaskId -> historyManager.removeById(subtaskId));
+        historyManager.removeById(id);
 
         epics.remove(id);
     }
@@ -163,7 +163,7 @@ public class InMemoryTaskManager implements TaskManager {
         Task subtask = getSubtaskById(id);
         if (subtasks.contains(subtask)) {
             getEpicBySubtaskId(id).removeSubtask(id);
-            historyManager.remove(id);
+            historyManager.removeById(id);
         }
     }
 
@@ -179,21 +179,21 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void checkEpicStatus(Epic epic) {
-        List<TaskStatuses> subtaskStatuses = epic.getSubtasks()
+        List<TaskStatus> subtaskStatuses = epic.getSubtasks()
                 .stream()
                 .map(Subtask::getStatus)
                 .collect(Collectors.toList());
 
 
-        boolean statusNew = subtaskStatuses.stream().allMatch(s -> s.equals(TaskStatuses.NEW));
-        boolean statusDone = subtaskStatuses.stream().allMatch(s -> s.equals(TaskStatuses.DONE));
+        boolean statusNew = subtaskStatuses.stream().allMatch(s -> s.equals(TaskStatus.NEW));
+        boolean statusDone = subtaskStatuses.stream().allMatch(s -> s.equals(TaskStatus.DONE));
 
         if (statusNew) {
-            epic.setStatus(TaskStatuses.NEW);
+            epic.setStatus(TaskStatus.NEW);
         } else if (statusDone) {
-            epic.setStatus(TaskStatuses.DONE);
+            epic.setStatus(TaskStatus.DONE);
         } else {
-            epic.setStatus(TaskStatuses.IN_PROGRESS);
+            epic.setStatus(TaskStatus.IN_PROGRESS);
         }
     }
 }

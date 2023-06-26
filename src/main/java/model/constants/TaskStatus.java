@@ -1,6 +1,6 @@
 package model.constants;
 
-public enum TaskStatuses {
+public enum TaskStatus {
 
 	NEW(1, "NEW"),
 	IN_PROGRESS(2, "IN_PROGRESS"),
@@ -9,7 +9,7 @@ public enum TaskStatuses {
 	private int statusId;
 	private String status;
 
-	TaskStatuses(int statusId, String status) {
+	TaskStatus(int statusId, String status) {
 		this.statusId = statusId;
 		this.status = status;
 	}

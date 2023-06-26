@@ -3,34 +3,34 @@ package manager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
-import model.constants.TaskStatuses;
+import model.constants.TaskStatus;
 import java.util.List;
 
 public interface TaskManager {
 
-    public List<Task> getAllTasks();
-    public List<Task> getAllEpics();
-    public List<Task> getAllSubtasks();
+    List<Task> getAllTasks();
+    List<Task> getAllEpics();
+    List<Task> getAllSubtasks();
 
-    public void removeAllTasks();
-    public void removeAllEpics();
-    public void removeAllSubtasks();
+    void removeAllTasks();
+    void removeAllEpics();
+    void removeAllSubtasks();
 
-    public Task getTaskById(int id);
-    public Task getEpicById(int id);
-    public Task getSubtaskById(int id);
+    Task getTaskById(int id);
+    Task getEpicById(int id);
+    Task getSubtaskById(int id);
 
-    public List<Subtask> getAllSubtasksFromEpic(int epicId);
+    List<Subtask> getAllSubtasksFromEpic(int epicId);
 
-    public void createTask(Task task);
-    public void createEpic(Epic epic);
-    public void createSubtask(Subtask subtask, Epic epic);
+    void createTask(Task task);
+    void createEpic(Epic epic);
+    void createSubtask(Subtask subtask, Epic epic);
 
-    public void updateTask(Task task, String title, String description, TaskStatuses status);
-    public void updateEpic(Epic epic, String title, String description);
-    public void updateSubtask(int subtaskId, Subtask newSubtaskData);
+    void updateTask(Task task, String title, String description, TaskStatus status);
+    void updateEpic(Epic epic, String title, String description);
+    void updateSubtask(int subtaskId, Subtask newSubtaskData);
 
-    public void removeTaskById(int id);
-    public void removeEpicById(int id);
-    public void removeSubtaskById(int id);
+    void removeTaskById(int id);
+    void removeEpicById(int id);
+    void removeSubtaskById(int id);
 }

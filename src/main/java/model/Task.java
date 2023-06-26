@@ -1,25 +1,25 @@
 package model;
 
-import model.constants.TaskStatuses;
+import model.constants.TaskStatus;
 
 public class Task {
 	private int id;
 	private String title;
 	private String description;
-	private TaskStatuses status = TaskStatuses.NEW;
+	private TaskStatus status = TaskStatus.NEW;
 
 	public Task(String title, String description) {
 		this.title = title;
 		this.description = description;
 	}
 
-	public Task(String title, String description, TaskStatuses status) {
+	public Task(String title, String description, TaskStatus status) {
 		this.title = title;
 		this.description = description;
 		this.status = status;
 	}
 
-	public Task(int id, String title, String description, TaskStatuses status) {
+	public Task(int id, String title, String description, TaskStatus status) {
 		this.id = id;
 		this.title = title;
 		this.description = description;
@@ -50,11 +50,11 @@ public class Task {
 		this.description = description;
 	}
 
-	public TaskStatuses getStatus() {
+	public TaskStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(TaskStatuses status) {
+	public void setStatus(TaskStatus status) {
 		this.status = status;
 	}
 
