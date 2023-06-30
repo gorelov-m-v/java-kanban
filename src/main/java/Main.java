@@ -34,14 +34,18 @@ public class Main {
 
         manager.getEpicById(1);
         manager.getSubtaskById(2);
-        manager.getSubtaskById(22);
-        manager.getTaskById(7);
-        manager.getSubtaskById(4);
+        manager.getEpicById(1);
+        manager.getTaskById(5);
         manager.getEpicById(6);
+        manager.removeEpicById(1);
+//        manager.getSubtaskById(22);
+//        manager.getTaskById(7);
+//        manager.getSubtaskById(4);
+//        manager.getEpicById(6);
 
 
-        manager.removeSubtaskById(22);
-        manager.removeTaskById(51);
+//        manager.removeSubtaskById(22);
+//        manager.removeTaskById(51);
 
 
 
