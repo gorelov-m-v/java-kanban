@@ -60,7 +60,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void removeById(int id) {
         customLinkedList.computeIfPresent(id, (k, v) -> {
-            removeNode(customLinkedList.get(id));
+            removeNode(customLinkedList.get(k));
             return null;
         });
     }
@@ -82,11 +82,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-        customLinkedList.computeIfPresent(task.getId(), (k, v) -> {
-            removeNode(customLinkedList.get(k));
-            return null;
-        });
-        Node newNode = linkLast(task);
-        customLinkedList.put(task.getId(), newNode);
+        removeById(task.getId());
+        customLinkedList.put(task.getId(), linkLast(task));
     }
 }

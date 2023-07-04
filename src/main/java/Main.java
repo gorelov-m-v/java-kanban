@@ -37,7 +37,6 @@ public class Main {
         manager.getEpicById(1);
         manager.getTaskById(5);
         manager.getEpicById(6);
-        manager.removeEpicById(1);
 //        manager.getSubtaskById(22);
 //        manager.getTaskById(7);
 //        manager.getSubtaskById(4);
