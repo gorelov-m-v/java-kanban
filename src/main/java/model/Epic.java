@@ -1,5 +1,7 @@
 package model;
 
+import model.constants.TaskStatus;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +10,10 @@ public class Epic extends Task {
 
 	public Epic(String title, String description) {
 		super(title, description);
+	}
+
+	public Epic(int id, String title, String description, TaskStatus status) {
+		super(id, title, description, status);
 	}
 
 	public void addSubtask(Integer subtask) {

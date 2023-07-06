@@ -31,23 +31,22 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return String.join(SEPARATOR, arr);
     }
 
-    public Task taskFromCSV(String valuesString) {
-        String[] valuesArray = valuesString.split(SEPARATOR);
-        if (valuesArray[1].equals("EPIC")) {
-            Epic epic = new Epic(valuesArray[2], valuesArray[4]);
-            epic.setId(Integer.parseInt(valuesArray[0]));
-            epic.setStatus(TaskStatus.valueOf(valuesArray[3]));
-            return epic;
-        } else if (valuesArray[1].equals("TASK")) {
-            Task task = new Task(valuesArray[2], valuesArray[4]);
-            task.setId(Integer.parseInt(valuesArray[0]));
-            task.setStatus(TaskStatus.valueOf(valuesArray[3]));
-            return task;
+    public Task taskFromCSV(String str) {
+        String[] values = str.split(SEPARATOR);
+
+        int id = Integer.parseInt(values[0]);
+        String type = values[1];
+        String title = values[2];
+        TaskStatus status = TaskStatus.valueOf(values[3]);
+        String description = values[4];
+        int epicId = Integer.parseInt(values[5]);
+
+        if (type.equals("EPIC")) {
+            return new Epic(id, title, description, status);
+        } else if (type.equals("TASK")) {
+            return new Task(id, title, description, status);
         } else {
-            Subtask subtask = new Subtask(valuesArray[2], valuesArray[4], Integer.parseInt(valuesArray[5]));
-            subtask.setId(Integer.parseInt(valuesArray[0]));
-            subtask.setStatus(TaskStatus.valueOf(valuesArray[3]));
-            return subtask;
+            return new Subtask(id, title, description, epicId, status);
         }
     }
 
@@ -60,7 +59,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public List<Integer> historyFromCSV(String valuesString) {
-        if (valuesString != "") {
+        if (!valuesString.equals("")) {
             String[] taskIdList = valuesString.split(SEPARATOR);
             return  Arrays.stream(taskIdList)
                     .map(Integer::parseInt)
