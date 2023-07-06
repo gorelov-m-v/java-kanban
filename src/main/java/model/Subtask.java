@@ -3,20 +3,25 @@ package model;
 import model.constants.TaskStatus;
 
 public class Subtask extends Task {
-	private final Epic epic;
+	private final int epicId;
 
-	public Subtask(String title, String description, Epic epic, TaskStatus status) {
+	public Subtask(String title, String description, int epicId, TaskStatus status) {
 		super(title, description, status);
-		this.epic = epic;
+		this.epicId = epicId;
 	}
 
-	public Subtask(int id, String title, String description, Epic epic, TaskStatus status) {
+	public Subtask(int id, String title, String description, int epicId, TaskStatus status) {
 		super(id, title, description, status);
-		this.epic = epic;
+		this.epicId = epicId;
 	}
 
-	public Epic getEpic() {
-		return epic;
+	public Subtask(String title, String description, int epicId) {
+		super(title, description);
+		this.epicId = epicId;
+	}
+
+	public int getEpicId() {
+		return epicId;
 	}
 	@Override
 	public String toString() {
@@ -25,7 +30,7 @@ public class Subtask extends Task {
 				", title='" + getTitle() + '\'' +
 				", status=" + getStatus() +
 				", description='" + getDescription() + '\'' +
-				", epicId=" + epic.getId() +
+				", epicId=" + epicId +
 				'}';
 	}
 }

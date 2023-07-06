@@ -1,8 +1,13 @@
+
+import manager.FileBackedTasksManager;
 import manager.InMemoryTaskManager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
 import model.constants.TaskStatus;
+
+import java.io.File;
+import java.nio.file.Path;
 
 public class Main {
 
@@ -13,9 +18,7 @@ public class Main {
 
 
         Epic epic = new Epic("Title1", "Description1");
-        Subtask subtask = new Subtask("Title", "Title", epic, TaskStatus.NEW);
-        Subtask subtask1 = new Subtask("Title1", "Title1", epic, TaskStatus.NEW);
-        Subtask subtask2 = new Subtask("Title2", "Title2", epic, TaskStatus.NEW);
+
         Task task1 = new Task("Test1", "Test1");
         Epic epic2 = new Epic("Title1", "Description1");
 
@@ -26,9 +29,13 @@ public class Main {
 
 
         manager.createEpic(epic);
-        manager.createSubtask(subtask, epic);
-        manager.createSubtask(subtask1, epic);
-        manager.createSubtask(subtask2, epic);
+        Subtask subtask = new Subtask("Title", "Title", epic.getId(), TaskStatus.NEW);
+        Subtask subtask1 = new Subtask("Title1", "Title1", epic.getId(), TaskStatus.NEW);
+        Subtask subtask2 = new Subtask("Title2", "Title2", epic.getId(), TaskStatus.NEW);
+        manager.createSubtask(subtask, epic.getId());
+        manager.createSubtask(subtask1, epic.getId());
+        manager.createSubtask(subtask2, epic.getId());
+
         manager.createTask(task1);
         manager.createEpic(epic2);
 
@@ -46,7 +53,19 @@ public class Main {
 //        manager.removeSubtaskById(22);
 //        manager.removeTaskById(51);
 
+         final Path PATH = Path.of("test.csv");
+         File file = new File(String.valueOf(PATH));
+        FileBackedTasksManager fb = new FileBackedTasksManager(file);
+        System.out.println("ghjdthrf");
+        System.out.println(fb.taskToSCV(subtask2));
+        System.out.println("---------------------------------------------");
+        System.out.println(subtask2);
+        System.out.println(fb.taskFromCSV("1,EPIC,Title1,NEW,Description1,null"));
 
+
+
+        System.out.println(fb.historyToCsv().toString());
+        System.out.println(fb.historyFromCSV(fb.historyToCsv().toString()));
 
         System.out.println(manager.historyManager.getHistory());
     }
