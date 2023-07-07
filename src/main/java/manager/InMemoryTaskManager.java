@@ -7,13 +7,14 @@ import model.constants.TaskStatus;
 import model.constants.TaskType;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InMemoryTaskManager implements TaskManager {
     public static HistoryManager historyManager = Managers.getDefaultHistoryManager();
 
     public final Map<Integer, Task> tasks = new HashMap<>();
     public final Map<Integer, Epic> epics = new HashMap<>();
-    public  final Map<Integer, Subtask> subtasks = new HashMap<>();
+    public final Map<Integer, Subtask> subtasks = new HashMap<>();
     private int i = 0;
 
 

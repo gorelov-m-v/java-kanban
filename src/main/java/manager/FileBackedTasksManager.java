@@ -4,10 +4,13 @@ import model.Epic;
 import model.Subtask;
 import model.Task;
 import model.constants.TaskStatus;
+import model.exceptions.ManagerSaveException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
+    public static HistoryManager historyManager = Managers.getDefaultHistoryManager();
     private static final Path PATH = Path.of("src/main/resources/test.csv");
     private File file = new File(String.valueOf(PATH));
     public static final String SEPARATOR = ",";
@@ -36,15 +40,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return String.join(SEPARATOR, arr);
     }
 
-    public Task taskFromCSV(String str) {
-        String[] values = str.split(SEPARATOR);
+    public Task taskFromCSV(String line) {
+        String[] attributes = line.split(",");
 
-        int id = Integer.parseInt(values[0]);
-        String type = values[1];
-        String title = values[2];
-        TaskStatus status = TaskStatus.valueOf(values[3]);
-        String description = values[4];
-        int epicId = type.equals("SUBTASK") ? Integer.parseInt(values[5]) : null;
+        int id = Integer.parseInt(attributes[0]);
+        String type = attributes[1];
+        String title = attributes[2];
+        TaskStatus status = TaskStatus.valueOf(attributes[3]);
+        String description = attributes[4];
+        int epicId = type.equals("SUBTASK") ? Integer.parseInt(attributes[5]) : 0;
 
         if (type.equals("EPIC")) {
             return new Epic(id, title, description, status);
@@ -66,7 +70,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public List<Integer> historyFromCSV(String valuesString) {
         if (!valuesString.equals("")) {
             String[] taskIdList = valuesString.split(SEPARATOR);
-            return  Arrays.stream(taskIdList)
+            return Arrays.stream(taskIdList)
                     .map(Integer::parseInt)
                     .collect(Collectors.toList());
         } else {
@@ -79,11 +83,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             String str = Stream.of(getAllEpics(), getAllSubtasks(), getAllTasks())
                     .flatMap(List::stream)
                     .map(this::taskToSCV)
-                    .collect(Collectors.joining("\n"));
+                    .collect(Collectors.joining(",\n"));
             String history = historyToCsv();
 
             fileWriter.write(HEADER + "\n");
             fileWriter.write(str + "\n");
+            fileWriter.write("\n");
             // Просто хотел попробовать что такое и как можно работать с null иначе, возможно не самое удачное место))
             Optional.of(history).ifPresent(h -> {
                 try {
@@ -96,6 +101,38 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             throw new RuntimeException(e);
         }
     }
+
+    public FileBackedTasksManager load() {
+        FileBackedTasksManager fb = new FileBackedTasksManager(file);
+
+        List<String> lines = loadFileToBuffer();
+
+        for (int i = 0; i <= lines.size(); i++) {
+            if (i < lines.size() - 2) {
+                Task task = taskFromCSV(lines.get(i));
+                if (task.getClass() == Task.class) {
+                    fb.tasks.put(task.getId(), task);
+                } else if (task.getClass() == Epic.class) {
+                    fb.epics.put(task.getId(), (Epic) task);
+                } else {
+                    fb.subtasks.put(task.getId(), (Subtask) task);
+                }
+            } else if (i == lines.size() - 1 && lines.get(i) != null) {
+                List<Integer> history = historyFromCSV(lines.get(i));
+                for (Integer historyPoint : history) {
+                    if (getTaskById(historyPoint) != null) {
+                        fb.historyManager.add(getTaskById(historyPoint));
+                    } else if (getEpicById(historyPoint) != null) {
+                        fb.historyManager.add(getEpicById(historyPoint));
+                    } else {
+                        fb.historyManager.add(getSubtaskById(historyPoint));
+                    }
+                }
+            }
+        }
+        return fb;
+    }
+
 
     @Override
     public void createTask(Task task) {
@@ -150,4 +187,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return subtask;
     }
 
+    private List<String> loadFileToBuffer() {
+        try (BufferedReader br = Files.newBufferedReader(PATH, StandardCharsets.UTF_8)) {
+            br.readLine();
+            String line = br.readLine();
+            List<String> lines = new ArrayList<>();
+            while (line != null) {
+                lines.add(line);
+                line = br.readLine();
+            }
+            return lines;
+        } catch (IOException e) {
+            throw new ManagerSaveException("Не вышло :[", e);
+        }
+    }
 }
