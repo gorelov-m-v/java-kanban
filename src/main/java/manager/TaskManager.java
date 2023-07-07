@@ -12,7 +12,7 @@ public interface TaskManager {
 
     List<Task> getAllTasks();
     List<Task> getAllEpics();
-    List<Task> getAllSubtasks();
+    List<Subtask> getAllSubtasks();
 
     void removeAllTasks();
     void removeAllEpics();

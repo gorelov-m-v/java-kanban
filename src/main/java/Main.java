@@ -13,6 +13,9 @@ public class Main {
 
     public static void main(String[] args) {
         InMemoryTaskManager manager = new InMemoryTaskManager();
+        final Path PATH = Path.of("src/main/resources/test.csv");
+        File file = new File(String.valueOf(PATH));
+        FileBackedTasksManager fb = new FileBackedTasksManager(file);
 
         System.out.println("Поехали!");
 
@@ -28,22 +31,32 @@ public class Main {
 //        Subtask subtask5 = new Subtask("Title2", "Title2", epic, TaskStatuses.NEW);
 
 
-        manager.createEpic(epic);
+//        manager.createEpic(epic);
+//        System.out.println(manager.getAllEpics());
+        fb.createEpic(epic);
         Subtask subtask = new Subtask("Title", "Title", epic.getId(), TaskStatus.NEW);
         Subtask subtask1 = new Subtask("Title1", "Title1", epic.getId(), TaskStatus.NEW);
         Subtask subtask2 = new Subtask("Title2", "Title2", epic.getId(), TaskStatus.NEW);
-        manager.createSubtask(subtask, epic.getId());
-        manager.createSubtask(subtask1, epic.getId());
-        manager.createSubtask(subtask2, epic.getId());
+        fb.createSubtask(subtask, 1);
+        fb.createSubtask(subtask2, 1);
+        fb.getEpicById(1);
+        fb.getSubtaskById(2);
+        fb.getSubtaskById(3);
+//        manager.createSubtask(subtask, epic.getId());
+//        manager.createSubtask(subtask1, epic.getId());
+//        manager.createSubtask(subtask2, epic.getId());
 
-        manager.createTask(task1);
-        manager.createEpic(epic2);
+//        manager.createTask(task1);
+//        manager.createEpic(epic2);
+//
+//        manager.getEpicById(1);
+//        manager.getSubtaskById(2);
+//        manager.getEpicById(1);
+//        manager.getTaskById(5);
+//        manager.getEpicById(6);
+//        System.out.println(manager.getEpicBySubtaskId(2).getId());
 
-        manager.getEpicById(1);
-        manager.getSubtaskById(2);
-        manager.getEpicById(1);
-        manager.getTaskById(5);
-        manager.getEpicById(6);
+
 //        manager.getSubtaskById(22);
 //        manager.getTaskById(7);
 //        manager.getSubtaskById(4);
@@ -53,20 +66,21 @@ public class Main {
 //        manager.removeSubtaskById(22);
 //        manager.removeTaskById(51);
 
-         final Path PATH = Path.of("test.csv");
-         File file = new File(String.valueOf(PATH));
-        FileBackedTasksManager fb = new FileBackedTasksManager(file);
-        System.out.println("ghjdthrf");
-        System.out.println(fb.taskToSCV(subtask2));
-        System.out.println("---------------------------------------------");
-        System.out.println(subtask2);
-        System.out.println(fb.taskFromCSV("1,EPIC,Title1,NEW,Description1,null"));
+
+//        fb.createTask(task1);
 
 
 
-        System.out.println(fb.historyToCsv().toString());
-        System.out.println(fb.historyFromCSV(fb.historyToCsv().toString()));
+        System.out.println(fb.taskToSCV(subtask));
+//        System.out.println("---------------------------------------------");
+//        System.out.println(subtask);
+//        System.out.println(fb.taskFromCSV(fb.taskToSCV(subtask)));
 
-        System.out.println(manager.historyManager.getHistory());
+
+
+//        System.out.println(fb.historyToCsv().toString());
+//        System.out.println(fb.historyFromCSV(fb.historyToCsv().toString()));
+//
+//        System.out.println(manager.historyManager.getHistory());
     }
 }

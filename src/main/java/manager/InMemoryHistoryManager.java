@@ -50,13 +50,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         return allListHistory;
     }
 
-//    @Override
-//    public void removeById(int id) {
-//        if (customLinkedList.containsKey(id)) {
-//            removeNode(customLinkedList.get(id));
-//            customLinkedList.remove((id));
-//        }
-//    }
     @Override
     public void removeById(int id) {
         customLinkedList.computeIfPresent(id, (k, v) -> {
@@ -69,16 +62,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     public List<Task> getHistory() {
         return getTasks();
     }
-
-//    @Override
-//    public void add(Task task) {
-//        if(customLinkedList.containsKey(task.getId())) {
-//            removeNode(customLinkedList.get(task.getId()));
-//            customLinkedList.remove(task.getId());
-//        }
-//            Node newNode = linkLast(task);
-//            customLinkedList.put(task.getId(), newNode);
-//    }
 
     @Override
     public void add(Task task) {

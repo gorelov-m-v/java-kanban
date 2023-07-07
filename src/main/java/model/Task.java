@@ -58,6 +58,13 @@ public class Task {
 		this.status = status;
 	}
 
+	public String getEpicId(Task task) {
+		if (task.getClass() == Subtask.class) {
+			return Integer.toString(((Subtask) task).getEpicId());
+		}
+		return "";
+	}
+
 	@Override
 	public String toString() {
 		return "Task{" +

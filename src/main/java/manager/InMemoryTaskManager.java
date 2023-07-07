@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 public class InMemoryTaskManager implements TaskManager {
     public static HistoryManager historyManager = Managers.getDefaultHistoryManager();
 
-    private final Map<Integer, Task> tasks = new HashMap<>();
-    private final Map<Integer, Epic> epics = new HashMap<>();
-    private final Map<Integer, Subtask> subtasks = new HashMap<>();
+    public final Map<Integer, Task> tasks = new HashMap<>();
+    public final Map<Integer, Epic> epics = new HashMap<>();
+    public  final Map<Integer, Subtask> subtasks = new HashMap<>();
     private int i = 0;
 
 
@@ -21,26 +21,14 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getAllTasks() {
         return new ArrayList<>(tasks.values());
     }
-
     @Override
     public List<Task> getAllEpics() {
         return new ArrayList<>(epics.values());
     }
     @Override
-    public List<Task> getAllSubtasks() {
-        return new ArrayList<>(epics.values());
+    public List<Subtask> getAllSubtasks() {
+        return new ArrayList<>(subtasks.values());
     }
-
-//    @Override
-//    public List<Task> getAllSubtasks() {
-//        return epics.values()
-//                .stream()
-//                .map(Epic::getSubtasks)
-//                .flatMap(List::stream)
-//                .collect(Collectors.toList());
-//    }
-
-
     @Override
     public void removeAllTasks() {
         tasks.clear();
@@ -54,13 +42,6 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeAllSubtasks() {
         subtasks.clear();
     }
-
-//    @Override
-//    public void removeAllSubtasks() {
-//        epics.values().stream()
-//                .map(Epic::getSubtasks)
-//                .forEach(List::clear);
-//    }
 
     @Override
     public Task getTaskById(int id) {
@@ -88,22 +69,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
         return subtask;
     }
-
-//    @Override
-//    public Task getSubtaskById(int id) {
-//        Task subtask =  epics.values()
-//                .stream()
-//                .map(Epic::getSubtasks)
-//                .flatMap(List::stream)
-//                .filter(s -> s.getId() == id)
-//                .findFirst()
-//                .orElse(null);
-//
-//        if (subtask != null) {
-//            historyManager.add(subtask);
-//        }
-//        return subtask;
-//    }
 
     @Override
     public List<Integer> getAllSubtasksFromEpic(int epicId) {
@@ -180,7 +145,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeSubtaskById(int id) {
-        List<Task> subtasks = getAllSubtasks();
+        List<Subtask> subtasks = getAllSubtasks();
         Task subtask = getSubtaskById(id);
         if (subtasks.contains(subtask)) {
             getEpicBySubtaskId(id).removeSubtask(id);
@@ -191,7 +156,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic getEpicBySubtaskId(int subtaskId) {
         return epics.values().stream()
-                .filter(epic -> epic.getSubtasks().contains(getSubtaskById(subtaskId)))
+                .filter(epic -> epic.getSubtasks().contains(subtaskId))
                 .findFirst()
                 .orElse(null);
     }
@@ -206,7 +171,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    private int getNewId() {
+    public int getNewId() {
         return ++i;
     }
 
@@ -229,7 +194,7 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setStatus(TaskStatus.IN_PROGRESS);
         }
     }
-    private Epic getEpic(int id) {
+    public Epic getEpic(int id) {
         Epic epic = epics.get(id);
 
         return epic;
