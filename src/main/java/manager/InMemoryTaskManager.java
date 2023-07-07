@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class InMemoryTaskManager implements TaskManager {
-    public static HistoryManager historyManager = Managers.getDefaultHistoryManager();
+    public HistoryManager historyManager = Managers.getDefaultHistoryManager();
 
     public final Map<Integer, Task> tasks = new HashMap<>();
     public final Map<Integer, Epic> epics = new HashMap<>();

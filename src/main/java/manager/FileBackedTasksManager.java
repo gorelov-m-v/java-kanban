@@ -18,17 +18,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
-    public static HistoryManager historyManager = Managers.getDefaultHistoryManager();
     private static final Path PATH = Path.of("src/main/resources/test.csv");
     private File file = new File(String.valueOf(PATH));
-    public static final String SEPARATOR = ",";
-    public static final String HEADER = "id,type,name,status,description,epicId";
+    private static final String SEPARATOR = ",";
+    private static final String HEADER = "id,type,name,status,description,epicId";
 
     public FileBackedTasksManager(File file) {
         this.file = file;
     }
 
-    public String taskToSCV(Task task) {
+    private String taskToSCV(Task task) {
         String[] arr = new String[]{
                 String.valueOf(task.getId()),
                 getType(task).name(),
@@ -40,7 +39,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return String.join(SEPARATOR, arr);
     }
 
-    public Task taskFromCSV(String line) {
+    private Task taskFromCSV(String line) {
         String[] attributes = line.split(",");
 
         int id = Integer.parseInt(attributes[0]);
@@ -59,7 +58,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    public String historyToCsv() {
+    static private String historyToCsv(HistoryManager historyManager) {
         return historyManager.getHistory()
                 .stream()
                 .map(Task::getId)
@@ -67,7 +66,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 .collect(Collectors.joining(","));
     }
 
-    public List<Integer> historyFromCSV(String valuesString) {
+    private List<Integer> historyFromCSV(String valuesString) {
         if (!valuesString.equals("")) {
             String[] taskIdList = valuesString.split(SEPARATOR);
             return Arrays.stream(taskIdList)
@@ -78,13 +77,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    public void save() {
+    private void save() {
         try (FileWriter fileWriter = new FileWriter(file)) {
             String str = Stream.of(getAllEpics(), getAllSubtasks(), getAllTasks())
                     .flatMap(List::stream)
                     .map(this::taskToSCV)
                     .collect(Collectors.joining(",\n"));
-            String history = historyToCsv();
+            String history = historyToCsv(historyManager);
 
             fileWriter.write(HEADER + "\n");
             fileWriter.write(str + "\n");
@@ -102,14 +101,30 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    public FileBackedTasksManager load() {
+    private List<String> loadFileToBuffer() {
+        try (BufferedReader br = Files.newBufferedReader(PATH, StandardCharsets.UTF_8)) {
+            br.readLine();
+            String line = br.readLine();
+            List<String> lines = new ArrayList<>();
+            while (line != null) {
+                lines.add(line);
+                line = br.readLine();
+            }
+            return lines;
+        } catch (IOException e) {
+            throw new ManagerSaveException("Не вышло :[", e);
+        }
+    }
+
+    private static FileBackedTasksManager load(File file) {
         FileBackedTasksManager fb = new FileBackedTasksManager(file);
 
-        List<String> lines = loadFileToBuffer();
+        List<String> lines = fb.loadFileToBuffer();
+        System.out.println(lines);
 
         for (int i = 0; i <= lines.size(); i++) {
             if (i < lines.size() - 2) {
-                Task task = taskFromCSV(lines.get(i));
+                Task task = fb.taskFromCSV(lines.get(i));
                 if (task.getClass() == Task.class) {
                     fb.tasks.put(task.getId(), task);
                 } else if (task.getClass() == Epic.class) {
@@ -118,21 +133,21 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     fb.subtasks.put(task.getId(), (Subtask) task);
                 }
             } else if (i == lines.size() - 1 && lines.get(i) != null) {
-                List<Integer> history = historyFromCSV(lines.get(i));
+                List<Integer> history = fb.historyFromCSV(lines.get(i));
                 for (Integer historyPoint : history) {
-                    if (getTaskById(historyPoint) != null) {
-                        fb.historyManager.add(getTaskById(historyPoint));
-                    } else if (getEpicById(historyPoint) != null) {
-                        fb.historyManager.add(getEpicById(historyPoint));
-                    } else {
-                        fb.historyManager.add(getSubtaskById(historyPoint));
+                    if (fb.getTaskById(historyPoint) != null) {
+                        fb.historyManager.add(fb.getTaskById(historyPoint));
+                    } else if (fb.getEpicById(historyPoint) != null) {
+                        fb.historyManager.add(fb.getEpicById(historyPoint));
+                    } else if (fb.getTaskById(historyPoint) != null){
+                        fb.historyManager.add(fb.getSubtaskById(historyPoint));
                     }
                 }
             }
         }
+        System.out.println(fb.historyManager.getHistory());
         return fb;
     }
-
 
     @Override
     public void createTask(Task task) {
@@ -187,18 +202,22 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return subtask;
     }
 
-    private List<String> loadFileToBuffer() {
-        try (BufferedReader br = Files.newBufferedReader(PATH, StandardCharsets.UTF_8)) {
-            br.readLine();
-            String line = br.readLine();
-            List<String> lines = new ArrayList<>();
-            while (line != null) {
-                lines.add(line);
-                line = br.readLine();
-            }
-            return lines;
-        } catch (IOException e) {
-            throw new ManagerSaveException("Не вышло :[", e);
-        }
+    public static void main(String[] args) {
+
+        final Path PATH = Path.of("src/main/resources/test.csv");
+        File file = new File(String.valueOf(PATH));
+        FileBackedTasksManager fb = load(file);
+
+        Epic epic = new Epic("Title1", "Description1");
+
+        Task task1 = new Task("Test1", "Test1");
+        Epic epic2 = new Epic("Title1", "Description1");
+        Subtask subtask = new Subtask("Title", "Title", epic.getId(), TaskStatus.NEW);
+        Subtask subtask1 = new Subtask("Title1", "Title1", epic.getId(), TaskStatus.NEW);
+        Subtask subtask2 = new Subtask("Title2", "Title2", epic.getId(), TaskStatus.NEW);
+
+
+
+
     }
 }
