@@ -93,7 +93,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 try {
                     fileWriter.write(h);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw new ManagerSaveException("Не вышло :[", e);
                 }
             });
         } catch (IOException e) {
@@ -293,8 +293,5 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
         FileBackedTasksManager fbNew = load(file);
         System.out.println(fbNew.historyManager.getHistory());
-
-
-
     }
 }
