@@ -1,6 +1,6 @@
 package model;
 
-import model.constants.TaskStatus;
+import model.constant.TaskStatus;
 
 public class Subtask extends Task {
 	private final int epicId;

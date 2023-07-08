@@ -1,6 +1,6 @@
 package model;
 
-import model.constants.TaskStatus;
+import model.constant.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.List;

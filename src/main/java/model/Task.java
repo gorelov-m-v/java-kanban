@@ -1,6 +1,6 @@
 package model;
 
-import model.constants.TaskStatus;
+import model.constant.TaskStatus;
 
 public class Task {
 	private int id;

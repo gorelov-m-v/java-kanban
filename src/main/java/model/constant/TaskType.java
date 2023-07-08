@@ -1,4 +1,4 @@
-package model.constants;
+package model.constant;
 
 public enum TaskType {
     TASK("TASK"),

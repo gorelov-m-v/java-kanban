@@ -3,11 +3,10 @@ package manager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
-import model.constants.TaskStatus;
-import model.constants.TaskType;
+import model.constant.TaskStatus;
+import model.constant.TaskType;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class InMemoryTaskManager implements TaskManager {
     public HistoryManager historyManager = Managers.getDefaultHistoryManager();
