@@ -17,7 +17,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
-    private static final Path PATH = Path.of("src/main/resources/test.csv");
+    private static final Path PATH = Path.of(
+            "src" +File.separator +
+            "main" + File.separator +
+            "resources" + File.separator +
+            "test.csv");
     private File file = new File(String.valueOf(PATH));
     private static final String SEPARATOR = ",";
     private static final String HEADER = "id,type,name,status,description,epicId";
@@ -72,7 +76,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     .map(Integer::parseInt)
                     .collect(Collectors.toList());
         } else {
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -93,59 +97,59 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 try {
                     fileWriter.write(h);
                 } catch (IOException e) {
-                    throw new ManagerSaveException("Не вышло :[", e);
+                    throw new ManagerSaveException("Не вышло сохранить файл:[", e);
                 }
             });
         } catch (IOException e) {
-            throw new ManagerSaveException("Не вышло :[", e);
+            throw new ManagerSaveException("Не вышло сохранить файл:[", e);
         }
     }
 
     private List<String> loadFileToBuffer() {
-        try (BufferedReader br = Files.newBufferedReader(PATH, StandardCharsets.UTF_8)) {
-            br.readLine();
-            String line = br.readLine();
+        try (BufferedReader bufferedReader = Files.newBufferedReader(PATH, StandardCharsets.UTF_8)) {
+            bufferedReader.readLine();
+            String line = bufferedReader.readLine();
             List<String> lines = new ArrayList<>();
             while (line != null) {
                 lines.add(line);
-                line = br.readLine();
+                line = bufferedReader.readLine();
             }
             return lines;
         } catch (IOException e) {
-            throw new ManagerSaveException("Не вышло :[", e);
+            throw new ManagerSaveException("Не вышло загрузить файл:[", e);
         }
     }
 
     private static FileBackedTasksManager load(File file) {
-        FileBackedTasksManager fb = new FileBackedTasksManager(file);
-        List<String> lines = fb.loadFileToBuffer();
+        FileBackedTasksManager fileManager = new FileBackedTasksManager(file);
+        List<String> lines = fileManager.loadFileToBuffer();
 
         for (int i = 0; i <= lines.size(); i++) {
             if (i < lines.size() - 2) {
-                Task task = fb.taskFromCSV(lines.get(i));
+                Task task = fileManager.taskFromCSV(lines.get(i));
                 if (task.getClass() == Task.class) {
-                    fb.tasks.put(task.getId(), task);
+                    fileManager.tasks.put(task.getId(), task);
                 } else if (task.getClass() == Epic.class) {
-                    fb.epics.put(task.getId(), (Epic) task);
+                    fileManager.epics.put(task.getId(), (Epic) task);
                 } else {
-                    fb.subtasks.put(task.getId(), (Subtask) task);
+                    fileManager.subtasks.put(task.getId(), (Subtask) task);
                 }
             } else if (i == lines.size() - 1 && lines.get(i) != null) {
                 List<Integer> history = historyFromCSV(lines.get(i));
                 if (history != null) {
                     for (Integer historyPoint : history) {
-                        if (fb.tasks.get(historyPoint) != null) {
-                            fb.historyManager.add(fb.tasks.get(historyPoint));
-                        } else if (fb.epics.get(historyPoint) != null) {
-                            fb.historyManager.add(fb.epics.get(historyPoint));
-                        } else if (fb.subtasks.get(historyPoint) != null){
-                            fb.historyManager.add(fb.subtasks.get(historyPoint));
+                        if (fileManager.tasks.get(historyPoint) != null) {
+                            fileManager.historyManager.add(fileManager.tasks.get(historyPoint));
+                        } else if (fileManager.epics.get(historyPoint) != null) {
+                            fileManager.historyManager.add(fileManager.epics.get(historyPoint));
+                        } else if (fileManager.subtasks.get(historyPoint) != null){
+                            fileManager.historyManager.add(fileManager.subtasks.get(historyPoint));
                         }
                     }
                 }
             }
         }
-        return fb;
+        return fileManager;
     }
 
     @Override
