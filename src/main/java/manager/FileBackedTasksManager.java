@@ -120,7 +120,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         FileBackedTasksManager fb = new FileBackedTasksManager(file);
 
         List<String> lines = fb.loadFileToBuffer();
-        System.out.println(lines);
 
         for (int i = 0; i <= lines.size(); i++) {
             if (i < lines.size() - 2) {
@@ -135,17 +134,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             } else if (i == lines.size() - 1 && lines.get(i) != null) {
                 List<Integer> history = fb.historyFromCSV(lines.get(i));
                 for (Integer historyPoint : history) {
-                    if (fb.getTaskById(historyPoint) != null) {
-                        fb.historyManager.add(fb.getTaskById(historyPoint));
-                    } else if (fb.getEpicById(historyPoint) != null) {
-                        fb.historyManager.add(fb.getEpicById(historyPoint));
-                    } else if (fb.getTaskById(historyPoint) != null){
-                        fb.historyManager.add(fb.getSubtaskById(historyPoint));
+                    if (fb.tasks.get(historyPoint) != null) {
+                        fb.historyManager.add(fb.tasks.get(historyPoint));
+                    } else if (fb.epics.get(historyPoint) != null) {
+                        fb.historyManager.add(fb.epics.get(historyPoint));
+                    } else if (fb.subtasks.get(historyPoint) != null){
+                        fb.historyManager.add(fb.subtasks.get(historyPoint));
                     }
                 }
             }
         }
-        System.out.println(fb.historyManager.getHistory());
         return fb;
     }
 
