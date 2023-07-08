@@ -9,10 +9,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -84,6 +81,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         try (FileWriter fileWriter = new FileWriter(file)) {
             String str = Stream.of(getAllEpics(), getAllSubtasks(), getAllTasks())
                     .flatMap(List::stream)
+                    .sorted(Comparator.comparingInt(Task::getId))
                     .map(this::taskToSCV)
                     .collect(Collectors.joining(SEPARATOR + "\n"));
 
