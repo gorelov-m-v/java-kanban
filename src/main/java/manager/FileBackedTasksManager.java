@@ -131,14 +131,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     fb.subtasks.put(task.getId(), (Subtask) task);
                 }
             } else if (i == lines.size() - 1 && lines.get(i) != null) {
-                List<Integer> history = fb.historyFromCSV(lines.get(i));
-                for (Integer historyPoint : history) {
-                    if (fb.tasks.get(historyPoint) != null) {
-                        fb.historyManager.add(fb.tasks.get(historyPoint));
-                    } else if (fb.epics.get(historyPoint) != null) {
-                        fb.historyManager.add(fb.epics.get(historyPoint));
-                    } else if (fb.subtasks.get(historyPoint) != null){
-                        fb.historyManager.add(fb.subtasks.get(historyPoint));
+                List<Integer> history = historyFromCSV(lines.get(i));
+                if (history != null) {
+                    for (Integer historyPoint : history) {
+                        if (fb.tasks.get(historyPoint) != null) {
+                            fb.historyManager.add(fb.tasks.get(historyPoint));
+                        } else if (fb.epics.get(historyPoint) != null) {
+                            fb.historyManager.add(fb.epics.get(historyPoint));
+                        } else if (fb.subtasks.get(historyPoint) != null){
+                            fb.historyManager.add(fb.subtasks.get(historyPoint));
+                        }
                     }
                 }
             }
