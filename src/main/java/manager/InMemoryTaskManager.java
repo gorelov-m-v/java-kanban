@@ -176,7 +176,7 @@ public class InMemoryTaskManager implements TaskManager {
         return ++i;
     }
 
-    private void checkEpicStatus(Epic epic) {
+    public void checkEpicStatus(Epic epic) {
         List<TaskStatus> subtaskStatuses = epic.getSubtasks()
                 .stream()
                 .map(this::getSubtaskById)
