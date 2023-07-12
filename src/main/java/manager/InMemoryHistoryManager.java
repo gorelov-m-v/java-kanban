@@ -2,6 +2,7 @@ package manager;
 
 import model.Task;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final Map<Integer, Node> customLinkedList = new HashMap<>();

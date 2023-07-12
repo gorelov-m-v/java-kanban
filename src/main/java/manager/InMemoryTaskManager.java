@@ -46,27 +46,30 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
-        if (task != null) {
-            historyManager.add(task);
-        }
+        Optional<Task> optionalTask = Optional.ofNullable(task);
+
+        optionalTask.ifPresent(t -> historyManager.add(t));
+
         return task;
     }
 
     @Override
     public Epic getEpicById(int id) {
         Epic epic = epics.get(id);
-        if (epic != null) {
-            historyManager.add(epic);
-        }
+        Optional<Task> optionalTask = Optional.ofNullable(epic);
+
+        optionalTask.ifPresent(s -> historyManager.add(s));
+
         return epic;
     }
 
     @Override
     public Task getSubtaskById(int id) {
         Subtask subtask = subtasks.get(id);
-        if (subtask != null) {
-            historyManager.add(subtask);
-        }
+        Optional<Task> optionalTask = Optional.ofNullable(subtasks.get(id));
+
+        optionalTask.ifPresent(s -> historyManager.add(s));
+
         return subtask;
     }
 
@@ -117,13 +120,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(int subtaskId, Subtask newSubtaskData) {
         newSubtaskData.setId(subtaskId);
+        Optional<Epic> epicOptional = Optional.ofNullable(getEpicBySubtaskId(subtaskId));
 
-        int epicId = getEpicBySubtaskId(subtaskId).getId();
+        epicOptional.ifPresent(e -> {
+            subtasks.remove(subtaskId);
+            subtasks.put(subtaskId, newSubtaskData);
 
-        epics.get(epicId).removeSubtask(subtaskId);
-        epics.get(epicId).getSubtasks().add(newSubtaskData.getId());
-
-        checkEpicStatus(getEpicBySubtaskId(subtaskId));
+            checkEpicStatus(getEpicBySubtaskId(subtaskId));
+        });
     }
 
     @Override
@@ -145,12 +149,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeSubtaskById(int id) {
-        List<Subtask> subtasks = getAllSubtasks();
-        Task subtask = getSubtaskById(id);
-        if (subtasks.contains(subtask)) {
+        Optional<Task> optionalSubtask = Optional.ofNullable(getSubtaskById(id));
+
+        optionalSubtask.ifPresent(s -> {
             getEpicBySubtaskId(id).removeSubtask(id);
             historyManager.removeById(id);
-        }
+        });
     }
 
     @Override
