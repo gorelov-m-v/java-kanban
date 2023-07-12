@@ -146,7 +146,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 }
             }
         }
-        fileManager.subtasks.values().stream().forEach(s -> {
+        fileManager.subtasks.values().forEach(s -> {
             fileManager.getEpicById(s.getEpicId()).getSubtasks().add(s.getId());
         });
         return fileManager;
