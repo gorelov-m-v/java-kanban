@@ -9,6 +9,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLOutput;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -145,6 +146,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 }
             }
         }
+        fileManager.subtasks.values().stream().forEach(s -> {
+            fileManager.getEpicById(s.getEpicId()).getSubtasks().add(s.getId());
+        });
         return fileManager;
     }
 
@@ -304,13 +308,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         fb.getEpicById(1);
         fb.getSubtaskById(4);
         fb.getTaskById(2);
-        fb.removeSubtaskById(4);
 
-        fb.removeSubtaskById(99);
-        fb.removeTaskById(908);
-        fb.removeEpicById(333);
+        System.out.println(fb.getEpic(1));
 
         FileBackedTasksManager fbNew = load(file);
-        System.out.println(fbNew.historyManager.getHistory());
+        System.out.println(fbNew.getEpic(1));
+//        System.out.println(fbNew.historyManager.getHistory());
     }
 }
