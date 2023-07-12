@@ -5,7 +5,6 @@ import model.Subtask;
 import model.Task;
 import model.constant.TaskStatus;
 import model.exception.ManagerSaveException;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -148,37 +147,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
         return fileManager;
     }
-//    private static FileBackedTasksManager load(File file) {
-//        FileBackedTasksManager fileManager = new FileBackedTasksManager(file);
-//        List<String> lines = fileManager.loadFileToBuffer();
-//
-//        for (int i = 0; i <= lines.size(); i++) {
-//            if (i < lines.size() - 2) {
-//                Task task = fileManager.taskFromCSV(lines.get(i));
-//                if (task.getClass() == Task.class) {
-//                    fileManager.tasks.put(task.getId(), task);
-//                } else if (task.getClass() == Epic.class) {
-//                    fileManager.epics.put(task.getId(), (Epic) task);
-//                } else {
-//                    fileManager.subtasks.put(task.getId(), (Subtask) task);
-//                }
-//            } else if (i == lines.size() - 1 && lines.get(i) != null) {
-//                List<Integer> history = historyFromCSV(lines.get(i));
-//                if (history != null) {
-//                    for (Integer historyPoint : history) {
-//                        if (fileManager.tasks.get(historyPoint) != null) {
-//                            fileManager.historyManager.add(fileManager.tasks.get(historyPoint));
-//                        } else if (fileManager.epics.get(historyPoint) != null) {
-//                            fileManager.historyManager.add(fileManager.epics.get(historyPoint));
-//                        } else if (fileManager.subtasks.get(historyPoint) != null){
-//                            fileManager.historyManager.add(fileManager.subtasks.get(historyPoint));
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return fileManager;
-//    }
 
     @Override
     public void createTask(Task task) {
