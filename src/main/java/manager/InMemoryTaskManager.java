@@ -5,9 +5,7 @@ import model.Subtask;
 import model.Task;
 import model.constant.TaskStatus;
 import model.constant.TaskType;
-import model.exception.ManagerIntersectionException;
-
-import java.sql.SQLOutput;
+import model.exception.ManagerCreateIntersectionException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -91,11 +89,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createTask(Task task) {
-        task.setId(getNewId());
         try {
             checkIntersection(task);
+            task.setId(getNewId());
             tasks.put(task.getId(), task);
-        } catch (ManagerIntersectionException e) {
+        } catch (ManagerCreateIntersectionException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -108,14 +106,17 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createSubtask(Subtask subtask, int epicId) {
-        checkIntersection(subtask);
-        subtask.setId(getNewId());
-        Epic epic = getEpic(epicId);
-        epic.addSubtask(subtask.getId());
+        try {
+            checkIntersection(subtask);
+            subtask.setId(getNewId());
+            Epic epic = getEpic(epicId);
+            epic.addSubtask(subtask.getId());
 
-        updateEpicTime(epic);
-
-        subtasks.put(subtask.getId(), subtask);
+            subtasks.put(subtask.getId(), subtask);
+            updateEpicTime(epic);
+        } catch (ManagerCreateIntersectionException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
@@ -232,7 +233,7 @@ public class InMemoryTaskManager implements TaskManager {
         Instant endTime = epic.getSubtasks().stream()
                 .map(this::getSubtaskById)
                 .map(Task::getEndTime)
-                .max(Instant::compareTo)
+                .min(Instant::compareTo)
                 .orElse(null);
 
         long duration = Duration.between(startTime, endTime).toMinutes();
@@ -247,19 +248,18 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public void checkIntersection(Task task) {
-        Integer intersectionTask = Stream.of(getAllSubtasks(), getAllTasks())
+        Optional<Integer> intersectionTask = Stream.of(getAllSubtasks(), getAllTasks())
                 .flatMap(List::stream)
                 .filter(t ->
                         task.getStartTime().isAfter(t.getStartTime()) && task.getStartTime().isBefore(t.getEndTime())
                         ||
                         task.getEndTime().isAfter(t.getStartTime()) && task.getEndTime().isBefore(t.getEndTime()))
                 .map(Task::getId)
-                .findFirst()
-                .orElse(null);
+                .findFirst();
 
-        if (intersectionTask != null) {
-            throw new ManagerIntersectionException("Задача id = " + task.getId() +
-                    " пересекается с задачей id = " + intersectionTask);
+        if (intersectionTask.isPresent()) {
+            throw new ManagerCreateIntersectionException(String.format("Задача, которую вы хотите создать," +
+                    " пересекается с задачей с id = %s.", intersectionTask));
         }
     }
 

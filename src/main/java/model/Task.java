@@ -2,9 +2,10 @@ package model;
 
 import model.constant.TaskStatus;
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Task {
-
+	static AtomicInteger nextId = new AtomicInteger();
 	private int id;
 	private String title;
 	private String description;
