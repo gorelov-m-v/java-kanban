@@ -4,20 +4,29 @@ import model.Subtask;
 import model.Task;
 import model.constant.TaskStatus;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
+import static java.time.temporal.ChronoUnit.MINUTES;
+
 public class Main {
 
     public static void main(String[] args) {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
 
-        Epic epic1 = new Epic("Title1", "Description1");
-        manager.createEpic(epic1);
+        Task task1 = new Task("TitleTask1",
+                "DescriptionTask1",
+                Instant.now(),
+                40);
+        Task task2 = new Task("TitleTask2",
+                "DescriptionTask2",
+                Instant.now().plus(10, MINUTES),
+                40);
 
-        Subtask subtask1 = new Subtask("Test1", "Test1", epic1.getId(), TaskStatus.DONE);
-        manager.createSubtask(subtask1, epic1.getId());
-
-        System.out.println(manager.getSubtaskById(2));
-        Subtask newSubtaskData = new Subtask("NewTest1", "NewTest1", epic1.getId(), TaskStatus.DONE);
-        manager.updateSubtask(2, newSubtaskData);
-        System.out.println(manager.getSubtaskById(2));
+        taskManager.createTask(task1);
+        System.out.println(taskManager.getTaskById(1));
+        taskManager.createTask(task2);
+        System.out.println(taskManager.getTaskById(2));
     }
 }

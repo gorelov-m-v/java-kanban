@@ -1,10 +1,10 @@
 package model;
 
 import model.constant.TaskStatus;
-
 import java.time.Instant;
 
 public class Task {
+
 	private int id;
 	private String title;
 	private String description;
@@ -12,10 +12,12 @@ public class Task {
 	private Instant startTime;
 	private long duration;
 
-	public Task(String title, String description) {
+	public Task(String title, String description, Instant startTime, long duration) {
 		this.title = title;
 		this.description = description;
 		this.status = TaskStatus.NEW;
+		this.startTime = startTime;
+		this.duration = duration;
 	}
 
 
@@ -32,36 +34,50 @@ public class Task {
 		this.status = status;
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
+	public Task(String title, String description) {
 		this.title = title;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
 		this.description = description;
 	}
 
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
 	public TaskStatus getStatus() {
 		return status;
 	}
-
 	public void setStatus(TaskStatus status) {
 		this.status = status;
+	}
+	public Instant getStartTime() {
+		return startTime;
+	}
+	public void setStartTime(Instant startTime) {
+		this.startTime = startTime;
+	}
+	public long getDuration() {
+		return duration;
+	}
+	public void setDuration(long duration) {
+		this.duration = duration;
+	}
+
+	public Instant getEndTime() {
+		return startTime.plusSeconds(duration * 60);
 	}
 
 	public String getEpicId(Task task) {
@@ -71,14 +87,15 @@ public class Task {
 		return "";
 	}
 
-
 	@Override
 	public String toString() {
 		return "Task{" +
 				"id=" + id +
 				", title='" + title + '\'' +
 				", description='" + description + '\'' +
-				", status='" + status + '\'' +
+				", status=" + status +
+				", startTime=" + startTime +
+				", duration=" + duration +
 				'}';
 	}
 }

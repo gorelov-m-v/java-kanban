@@ -284,34 +284,34 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     public static void main(String[] args) {
 
-        final Path PATH = Path.of("src/main/resources/test.csv");
-        File file = new File(String.valueOf(PATH));
-        FileBackedTasksManager fb = new FileBackedTasksManager(file);
-
-        Epic epic1 = new Epic("Title1", "Description1");
-        fb.createEpic(epic1);
-
-        Task task1 = new Task("Test1", "Test1");
-        fb.createTask(task1);
-
-        Epic epic2 = new Epic("Title2", "Description2");
-        fb.createEpic(epic2);
-
-        Subtask subtask1 = new Subtask("Title1", "Title1", epic1.getId());
-        Subtask subtask2 = new Subtask("Title2", "Title2", epic1.getId());
-        Subtask subtask3 = new Subtask("Title3", "Title3", epic1.getId());
-        fb.createSubtask(subtask1, epic1.getId());
-        fb.createSubtask(subtask2, epic1.getId());
-        fb.createSubtask(subtask3, epic1.getId());
-
-        fb.getEpicById(1);
-        fb.getSubtaskById(4);
-        fb.getTaskById(2);
-
-        System.out.println(fb.getEpic(1));
-
-        FileBackedTasksManager fbNew = load(file);
-        System.out.println(fbNew.getEpic(1));
-//        System.out.println(fbNew.historyManager.getHistory());
+//        final Path PATH = Path.of("src/main/resources/test.csv");
+//        File file = new File(String.valueOf(PATH));
+//        FileBackedTasksManager fb = new FileBackedTasksManager(file);
+//
+//        Epic epic1 = new Epic("Title1", "Description1");
+//        fb.createEpic(epic1);
+//
+//        Task task1 = new Task("Test1", "Test1");
+//        fb.createTask(task1);
+//
+//        Epic epic2 = new Epic("Title2", "Description2");
+//        fb.createEpic(epic2);
+//
+//        Subtask subtask1 = new Subtask("Title1", "Title1", epic1.getId());
+//        Subtask subtask2 = new Subtask("Title2", "Title2", epic1.getId());
+//        Subtask subtask3 = new Subtask("Title3", "Title3", epic1.getId());
+//        fb.createSubtask(subtask1, epic1.getId());
+//        fb.createSubtask(subtask2, epic1.getId());
+//        fb.createSubtask(subtask3, epic1.getId());
+//
+//        fb.getEpicById(1);
+//        fb.getSubtaskById(4);
+//        fb.getTaskById(2);
+//
+//        System.out.println(fb.getEpic(1));
+//
+//        FileBackedTasksManager fbNew = load(file);
+//        System.out.println(fbNew.getEpic(1));
+////        System.out.println(fbNew.historyManager.getHistory());
     }
 }
