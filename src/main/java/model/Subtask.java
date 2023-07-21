@@ -5,6 +5,11 @@ import model.constant.TaskStatus;
 public class Subtask extends Task {
 	private final int epicId;
 
+	public Subtask(String title, String description, int epicId) {
+		super(title, description);
+		this.epicId = epicId;
+	}
+
 	public Subtask(String title, String description, int epicId, TaskStatus status) {
 		super(title, description, status);
 		this.epicId = epicId;

@@ -2,16 +2,22 @@ package model;
 
 import model.constant.TaskStatus;
 
+import java.time.Instant;
+
 public class Task {
 	private int id;
 	private String title;
 	private String description;
-	private TaskStatus status = TaskStatus.NEW;
+	private TaskStatus status;
+	private Instant startTime;
+	private long duration;
 
 	public Task(String title, String description) {
 		this.title = title;
 		this.description = description;
+		this.status = TaskStatus.NEW;
 	}
+
 
 	public Task(String title, String description, TaskStatus status) {
 		this.title = title;

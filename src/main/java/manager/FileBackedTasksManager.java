@@ -298,9 +298,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         Epic epic2 = new Epic("Title2", "Description2");
         fb.createEpic(epic2);
 
-        Subtask subtask1 = new Subtask("Title1", "Title1", epic1.getId(), TaskStatus.NEW);
-        Subtask subtask2 = new Subtask("Title2", "Title2", epic1.getId(), TaskStatus.NEW);
-        Subtask subtask3 = new Subtask("Title3", "Title3", epic1.getId(), TaskStatus.NEW);
+        Subtask subtask1 = new Subtask("Title1", "Title1", epic1.getId());
+        Subtask subtask2 = new Subtask("Title2", "Title2", epic1.getId());
+        Subtask subtask3 = new Subtask("Title3", "Title3", epic1.getId());
         fb.createSubtask(subtask1, epic1.getId());
         fb.createSubtask(subtask2, epic1.getId());
         fb.createSubtask(subtask3, epic1.getId());
