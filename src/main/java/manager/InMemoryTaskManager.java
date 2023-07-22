@@ -6,6 +6,7 @@ import model.Task;
 import model.constant.TaskStatus;
 import model.constant.TaskType;
 import model.exception.ManagerCreateIntersectionException;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -121,10 +122,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task task, String title, String description, TaskStatus status) {
-        task.setTitle(title);
-        task.setDescription(description);
-        task.setStatus(status);
-        tasks.put(task.getId(), task);
+        Task tempTask = task;
+        tempTask.setTitle(title);
+        tempTask.setDescription(description);
+        tempTask.setStatus(status);
+
+        try {
+            checkIntersection(tempTask);
+
+            tasks.put(task.getId(), tempTask);
+        } catch (ManagerCreateIntersectionException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     @Override
@@ -137,17 +147,24 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(int subtaskId, Subtask newSubtaskData) {
         newSubtaskData.setId(subtaskId);
-        Optional<Epic> epicOptional = Optional.ofNullable(getEpicBySubtaskId(subtaskId));
+        try {
+            checkIntersection(newSubtaskData);
+            Optional<Epic> epicOptional = Optional.ofNullable(getEpicBySubtaskId(subtaskId));
 
-        epicOptional.ifPresent(e -> {
-            subtasks.remove(subtaskId);
-            subtasks.put(subtaskId, newSubtaskData);
+            epicOptional.ifPresent(e -> {
+                subtasks.remove(subtaskId);
+                subtasks.put(subtaskId, newSubtaskData);
 
-            Epic epic = getEpicBySubtaskId(subtaskId);
+                Epic epic = getEpicBySubtaskId(subtaskId);
 
-            updateEpicTime(epic);
-            checkEpicStatus(epic);
-        });
+                updateEpicTime(epic);
+                checkEpicStatus(epic);
+            });
+        } catch (ManagerCreateIntersectionException e) {
+            System.out.println(e.getMessage());
+        }
+
+
     }
 
     @Override
@@ -233,7 +250,7 @@ public class InMemoryTaskManager implements TaskManager {
         Instant endTime = epic.getSubtasks().stream()
                 .map(this::getSubtaskById)
                 .map(Task::getEndTime)
-                .min(Instant::compareTo)
+                .max(Instant::compareTo)
                 .orElse(null);
 
         long duration = Duration.between(startTime, endTime).toMinutes();
@@ -258,8 +275,8 @@ public class InMemoryTaskManager implements TaskManager {
                 .findFirst();
 
         if (intersectionTask.isPresent()) {
-            throw new ManagerCreateIntersectionException(String.format("Задача, которую вы хотите создать," +
-                    " пересекается с задачей с id = %s.", intersectionTask));
+            throw new ManagerCreateIntersectionException(String.format("Задача, которую вы хотите создать/изменить," +
+                    " пересекается с задачей с id = %s.", intersectionTask.get()));
         }
     }
 
