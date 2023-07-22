@@ -5,7 +5,7 @@ import model.Subtask;
 import model.Task;
 import model.constant.TaskStatus;
 import model.constant.TaskType;
-import model.exception.ManagerCreateIntersectionException;
+import model.exception.ManagerIntersectionException;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -94,7 +94,7 @@ public class InMemoryTaskManager implements TaskManager {
             checkIntersection(task);
             task.setId(getNewId());
             tasks.put(task.getId(), task);
-        } catch (ManagerCreateIntersectionException e) {
+        } catch (ManagerIntersectionException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -115,26 +115,22 @@ public class InMemoryTaskManager implements TaskManager {
 
             subtasks.put(subtask.getId(), subtask);
             updateEpicTime(epic);
-        } catch (ManagerCreateIntersectionException e) {
+        } catch (ManagerIntersectionException e) {
             System.out.println(e.getMessage());
         }
     }
 
     @Override
-    public void updateTask(Task task, String title, String description, TaskStatus status) {
+    public void updateTask(Task task, Task newTaskData) {
         Task tempTask = task;
-        tempTask.setTitle(title);
-        tempTask.setDescription(description);
-        tempTask.setStatus(status);
 
         try {
-            checkIntersection(tempTask);
+            checkIntersection(newTaskData);
 
             tasks.put(task.getId(), tempTask);
-        } catch (ManagerCreateIntersectionException e) {
+        } catch (ManagerIntersectionException e) {
             System.out.println(e.getMessage());
         }
-
     }
 
     @Override
@@ -160,11 +156,9 @@ public class InMemoryTaskManager implements TaskManager {
                 updateEpicTime(epic);
                 checkEpicStatus(epic);
             });
-        } catch (ManagerCreateIntersectionException e) {
+        } catch (ManagerIntersectionException e) {
             System.out.println(e.getMessage());
         }
-
-
     }
 
     @Override
@@ -275,7 +269,7 @@ public class InMemoryTaskManager implements TaskManager {
                 .findFirst();
 
         if (intersectionTask.isPresent()) {
-            throw new ManagerCreateIntersectionException(String.format("Задача, которую вы хотите создать/изменить," +
+            throw new ManagerIntersectionException(String.format("Задача, которую вы хотите создать/изменить," +
                     " пересекается с задачей с id = %s.", intersectionTask.get()));
         }
     }

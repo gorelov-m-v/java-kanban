@@ -214,14 +214,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void updateTask(Task task, String title, String description, TaskStatus status) {
+    public void updateTask(Task task, Task newTaskData) {
         Optional<Task> optionalTask = Optional.ofNullable(task);
 
         optionalTask.ifPresent(t -> {
-            t.setTitle(title);
-            t.setDescription(description);
-            t.setStatus(status);
-            tasks.put(t.getId(), t);
+            tasks.put(t.getId(), newTaskData);
             save();
         });
     }
