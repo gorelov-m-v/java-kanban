@@ -6,6 +6,7 @@ import model.Task;
 import model.constant.TaskStatus;
 import model.constant.TaskType;
 import model.exception.ManagerIntersectionException;
+import model.exception.ManagerValidateException;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -27,14 +28,17 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getAllTasks() {
         return new ArrayList<>(tasks.values());
     }
+
     @Override
     public List<Task> getAllEpics() {
         return new ArrayList<>(epics.values());
     }
+
     @Override
     public List<Subtask> getAllSubtasks() {
         return new ArrayList<>(subtasks.values());
     }
+
     @Override
     public void removeAllTasks() {
         tasks.clear();
@@ -44,6 +48,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeAllEpics() {
         epics.clear();
     }
+
     @Override
     public void removeAllSubtasks() {
         subtasks.clear();
@@ -121,42 +126,65 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(Task task, Task newTaskData) {
-        Task tempTask = task;
-
+    public void updateTask(Integer taskId, Task newTaskData) {
         try {
-            checkIntersection(newTaskData);
+            if (taskId == null) {
+                throw new ManagerValidateException("id не может быть null");
+            } else if (!subtasks.containsKey(taskId)) {
+                throw new ManagerValidateException(String.format("Задачи с id = %d, не существует", taskId));
+            }
+            try {
+                checkIntersectionInUpdate(newTaskData);
 
-            tasks.put(task.getId(), tempTask);
-        } catch (ManagerIntersectionException e) {
+                tasks.put(taskId, newTaskData);
+            } catch (ManagerIntersectionException e) {
+                System.out.println(e.getMessage());
+            }
+        } catch (ManagerValidateException e) {
             System.out.println(e.getMessage());
         }
     }
 
     @Override
-    public void updateEpic(Epic epic, String title, String description) {
-        epic.setTitle(title);
-        epic.setDescription(description);
-        epics.put(epic.getId(), epic);
+    public void updateEpic(Integer epicId, Epic newEpic) {
+        try {
+            if (epicId == null) {
+                throw new ManagerValidateException("id не может быть null");
+            } else if (!subtasks.containsKey(epicId)) {
+                throw new ManagerValidateException(String.format("Эпика с id = %d, не существует", epicId));
+            }
+            newEpic.setId(epicId);
+            epics.put(epicId, newEpic);
+        } catch (ManagerValidateException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
-    public void updateSubtask(int subtaskId, Subtask newSubtaskData) {
-        newSubtaskData.setId(subtaskId);
+    public void updateSubtask(Integer subtaskId, Subtask newSubtaskData) {
         try {
-            checkIntersection(newSubtaskData);
-            Optional<Epic> epicOptional = Optional.ofNullable(getEpicBySubtaskId(subtaskId));
+            if (subtaskId == null) {
+                throw new ManagerValidateException("id не может быть null");
+            } else if (!subtasks.containsKey(subtaskId)) {
+                throw new ManagerValidateException(String.format("Подзадачи с id = %d, не существует", subtaskId));
+            }
+            try {
+                checkIntersectionInUpdate(newSubtaskData);
+                Optional<Epic> epicOptional = Optional.ofNullable(getEpicBySubtaskId(subtaskId));
 
-            epicOptional.ifPresent(e -> {
-                subtasks.remove(subtaskId);
-                subtasks.put(subtaskId, newSubtaskData);
+                epicOptional.ifPresent(e -> {
+                    subtasks.remove(subtaskId);
+                    subtasks.put(subtaskId, newSubtaskData);
 
-                Epic epic = getEpicBySubtaskId(subtaskId);
+                    Epic epic = getEpicBySubtaskId(subtaskId);
 
-                updateEpicTime(epic);
-                checkEpicStatus(epic);
-            });
-        } catch (ManagerIntersectionException e) {
+                    updateEpicTime(epic);
+                    checkEpicStatus(epic);
+                });
+            } catch (ManagerIntersectionException e) {
+                System.out.println(e.getMessage());
+            }
+        } catch (ManagerValidateException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -186,6 +214,7 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = getEpicBySubtaskId(id);
 
             epic.removeSubtask(id);
+            subtasks.remove(id);
             updateEpicTime(epic);
 
             historyManager.removeById(id);
@@ -199,6 +228,7 @@ public class InMemoryTaskManager implements TaskManager {
                 .findFirst()
                 .orElse(null);
     }
+
     @Override
     public TaskType getType(Task task) {
         if (task.getClass() == Epic.class) {
@@ -247,7 +277,12 @@ public class InMemoryTaskManager implements TaskManager {
                 .max(Instant::compareTo)
                 .orElse(null);
 
-        long duration = Duration.between(startTime, endTime).toMinutes();
+        long duration;
+        if (startTime == null && endTime == null) {
+            duration = 0;
+        } else {
+            duration = Duration.between(startTime, endTime).toMinutes();
+        }
 
         epic.setStartTime(startTime);
         epic.setEndTime(endTime);
@@ -263,8 +298,33 @@ public class InMemoryTaskManager implements TaskManager {
                 .flatMap(List::stream)
                 .filter(t ->
                         task.getStartTime().isAfter(t.getStartTime()) && task.getStartTime().isBefore(t.getEndTime())
-                        ||
-                        task.getEndTime().isAfter(t.getStartTime()) && task.getEndTime().isBefore(t.getEndTime()))
+                                ||
+                                task.getEndTime().isAfter(t.getStartTime()) && task.getEndTime().isBefore(t.getEndTime()))
+                .map(Task::getId)
+                .findFirst();
+
+        if (intersectionTask.isPresent()) {
+            throw new ManagerIntersectionException(String.format("Задача, которую вы хотите создать/изменить," +
+                    " пересекается с задачей с id = %s.", intersectionTask.get()));
+        }
+    }
+
+    public void checkIntersectionInUpdate(Task task) {
+        List<Subtask> tempSubtasks = getAllSubtasks();
+        List<Task> tempTasks = getAllTasks();
+
+        if (task.getClass() == Task.class) {
+            tempTasks.remove(getTaskById(task.getId()));
+        } else if (task.getClass() == Subtask.class) {
+            tempSubtasks.remove(getSubtaskById(task.getId()));
+        }
+
+        Optional<Integer> intersectionTask = Stream.of(tempSubtasks, tempTasks)
+                .flatMap(List::stream)
+                .filter(t ->
+                        task.getStartTime().isAfter(t.getStartTime()) && task.getStartTime().isBefore(t.getEndTime())
+                                ||
+                                task.getEndTime().isAfter(t.getStartTime()) && task.getEndTime().isBefore(t.getEndTime()))
                 .map(Task::getId)
                 .findFirst();
 

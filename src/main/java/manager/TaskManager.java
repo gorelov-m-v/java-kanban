@@ -3,7 +3,6 @@ package manager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
-import model.constant.TaskStatus;
 import model.constant.TaskType;
 
 import java.util.List;
@@ -19,7 +18,7 @@ public interface TaskManager {
     void removeAllSubtasks();
 
     Task getTaskById(int id);
-    Task getEpicById(int id);
+    Epic getEpicById(int id);
     Task getSubtaskById(int id);
 
     List<Integer> getAllSubtasksFromEpic(int epicId);
@@ -28,9 +27,9 @@ public interface TaskManager {
     void createEpic(Epic epic);
     void createSubtask(Subtask subtask, int epicId);
 
-    void updateTask(Task task, Task newTaskData);
-    void updateEpic(Epic epic, String title, String description);
-    void updateSubtask(int subtaskId, Subtask newSubtaskData);
+    void updateTask(Integer taskId, Task newTaskData);
+    void updateEpic(Integer epicId, Epic newEpic);
+    void updateSubtask(Integer subtaskId, Subtask newSubtask);
 
     void removeTaskById(int id);
     void removeEpicById(int id);

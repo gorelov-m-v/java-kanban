@@ -4,6 +4,7 @@ import model.constant.TaskStatus;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class Epic extends Task {
@@ -52,5 +53,25 @@ public class Epic extends Task {
 				", endTime='" + getEndTime() + '\'' +
 				", duration='" + getDuration() + '\'' +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+
+		Epic epic = (Epic) o;
+
+		if (!Objects.equals(subtasks, epic.subtasks)) return false;
+		return Objects.equals(endTime, epic.endTime);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = super.hashCode();
+		result = 31 * result + (subtasks != null ? subtasks.hashCode() : 0);
+		result = 31 * result + (endTime != null ? endTime.hashCode() : 0);
+		return result;
 	}
 }

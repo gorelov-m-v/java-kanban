@@ -2,6 +2,7 @@ package model;
 
 import model.constant.TaskStatus;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Task {
@@ -98,5 +99,31 @@ public class Task {
 				", startTime=" + startTime +
 				", duration=" + duration +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Task task = (Task) o;
+
+		if (id != task.id) return false;
+		if (duration != task.duration) return false;
+		if (!Objects.equals(title, task.title)) return false;
+		if (!Objects.equals(description, task.description)) return false;
+		if (status != task.status) return false;
+		return Objects.equals(startTime, task.startTime);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = id;
+		result = 31 * result + (title != null ? title.hashCode() : 0);
+		result = 31 * result + (description != null ? description.hashCode() : 0);
+		result = 31 * result + (status != null ? status.hashCode() : 0);
+		result = 31 * result + (startTime != null ? startTime.hashCode() : 0);
+		result = 31 * result + (int) (duration ^ (duration >>> 32));
+		return result;
 	}
 }

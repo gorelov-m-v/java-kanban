@@ -213,30 +213,29 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return subtask;
     }
 
+//    @Override
+//    public void updateTask(Integer taskId, Task newTaskData) {
+//        Optional<Task> optionalTask = Optional.ofNullable(task);
+//
+//        optionalTask.ifPresent(t -> {
+//            tasks.put(t.getId(), newTaskData);
+//            save();
+//        });
+//    }
+
+//    @Override
+//    public void updateEpic(Epic epic, Epic newEpic) {
+//        Optional<Epic> optionalTask = Optional.ofNullable(epic);
+//
+//        optionalTask.ifPresent(e -> {
+//            newEpic.setId(e.getId());
+//            epics.put(e.getId(), newEpic);
+//            save();
+//        });
+//    }
+
     @Override
-    public void updateTask(Task task, Task newTaskData) {
-        Optional<Task> optionalTask = Optional.ofNullable(task);
-
-        optionalTask.ifPresent(t -> {
-            tasks.put(t.getId(), newTaskData);
-            save();
-        });
-    }
-
-    @Override
-    public void updateEpic(Epic epic, String title, String description) {
-        Optional<Epic> optionalTask = Optional.ofNullable(epic);
-
-        optionalTask.ifPresent(e -> {
-            e.setTitle(title);
-            e.setDescription(description);
-            epics.put(e.getId(), e);
-            save();
-        });
-    }
-
-    @Override
-    public void updateSubtask(int subtaskId, Subtask newSubtaskData) {
+    public void updateSubtask(Integer subtaskId, Subtask newSubtaskData) {
         newSubtaskData.setId(subtaskId);
         Optional<Epic> epicOptional = Optional.ofNullable(getEpicBySubtaskId(subtaskId));
 
