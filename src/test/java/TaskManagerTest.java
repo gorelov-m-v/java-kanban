@@ -512,4 +512,29 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         assertEquals(List.of(), manager.getAllSubtasksFromEpic(10));
     }
+
+    @Test
+    public void shouldReturnEpicBySubtaskId() {
+        Epic epic = new Epic("TestTaskTitle", "TestTaskDescription");
+        manager.createEpic(epic);
+        Subtask subtask1 = new Subtask(
+                "TestSubtaskTitle", "TestSubtaskDescription", 1,
+                Instant.now(), 30);
+        manager.createSubtask(subtask1, 1);
+
+        assertEquals(epic, manager.getEpicBySubtaskId(2));
+    }
+
+    @Test
+    public void shouldReturnNullWhenGetEpicByWrongSubtaskId() {
+        Epic epic = new Epic("TestTaskTitle", "TestTaskDescription");
+        manager.createEpic(epic);
+        Subtask subtask1 = new Subtask(
+                "TestSubtaskTitle", "TestSubtaskDescription", 1,
+                Instant.now(), 30);
+        manager.createSubtask(subtask1, 1);
+
+        assertEquals(null, manager.getEpicBySubtaskId(10));
+    }
+
 }
