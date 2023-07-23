@@ -41,6 +41,14 @@ public class Task {
 		this.description = description;
 	}
 
+	public Task(String title, String description, Instant startTime, long duration, TaskStatus status) {
+		this.title = title;
+		this.description = description;
+		this.startTime = startTime;
+		this.duration = duration;
+		this.status = status;
+	}
+
 	public int getId() {
 		return id;
 	}

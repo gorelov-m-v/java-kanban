@@ -108,6 +108,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void createEpic(Epic epic) {
         epic.setId(getNewId());
         epics.put(epic.getId(), epic);
+        checkEpicStatus(epic);
     }
 
     @Override
@@ -120,6 +121,7 @@ public class InMemoryTaskManager implements TaskManager {
 
             subtasks.put(subtask.getId(), subtask);
             updateEpicTime(epic);
+            checkEpicStatus(epic);
         } catch (ManagerIntersectionException e) {
             System.out.println(e.getMessage());
         }
@@ -130,10 +132,11 @@ public class InMemoryTaskManager implements TaskManager {
         try {
             if (taskId == null) {
                 throw new ManagerValidateException("id не может быть null");
-            } else if (!subtasks.containsKey(taskId)) {
+            } else if (!tasks.containsKey(taskId)) {
                 throw new ManagerValidateException(String.format("Задачи с id = %d, не существует", taskId));
             }
             try {
+                newTaskData.setId(taskId);
                 checkIntersectionInUpdate(newTaskData);
 
                 tasks.put(taskId, newTaskData);
@@ -150,7 +153,7 @@ public class InMemoryTaskManager implements TaskManager {
         try {
             if (epicId == null) {
                 throw new ManagerValidateException("id не может быть null");
-            } else if (!subtasks.containsKey(epicId)) {
+            } else if (!epics.containsKey(epicId)) {
                 throw new ManagerValidateException(String.format("Эпика с id = %d, не существует", epicId));
             }
             newEpic.setId(epicId);
@@ -169,6 +172,7 @@ public class InMemoryTaskManager implements TaskManager {
                 throw new ManagerValidateException(String.format("Подзадачи с id = %d, не существует", subtaskId));
             }
             try {
+                newSubtaskData.setId(subtaskId);
                 checkIntersectionInUpdate(newSubtaskData);
                 Optional<Epic> epicOptional = Optional.ofNullable(getEpicBySubtaskId(subtaskId));
 
