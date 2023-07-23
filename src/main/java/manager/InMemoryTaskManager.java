@@ -251,7 +251,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void checkEpicStatus(Epic epic) {
         List<TaskStatus> subtaskStatuses = epic.getSubtasks()
                 .stream()
-                .map(this::getSubtaskById)
+                .map(this::getSubtask)
                 .map(Task::getStatus)
                 .collect(Collectors.toList());
 
@@ -268,15 +268,15 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    private void updateEpicTime(Epic epic) {
+    public void updateEpicTime(Epic epic) {
         Instant startTime = epic.getSubtasks().stream()
-                .map(this::getSubtaskById)
+                .map(this::getSubtask)
                 .map(Task::getStartTime)
                 .min(Instant::compareTo)
                 .orElse(null);
 
         Instant endTime = epic.getSubtasks().stream()
-                .map(this::getSubtaskById)
+                .map(this::getSubtask)
                 .map(Task::getEndTime)
                 .max(Instant::compareTo)
                 .orElse(null);
@@ -318,9 +318,9 @@ public class InMemoryTaskManager implements TaskManager {
         List<Task> tempTasks = getAllTasks();
 
         if (task.getClass() == Task.class) {
-            tempTasks.remove(getTaskById(task.getId()));
+            tempTasks.remove(task);
         } else if (task.getClass() == Subtask.class) {
-            tempSubtasks.remove(getSubtaskById(task.getId()));
+            tempSubtasks.remove(task);
         }
 
         Optional<Integer> intersectionTask = Stream.of(tempSubtasks, tempTasks)
@@ -342,5 +342,16 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(id);
 
         return epic;
+    }
+    public Task getTask(int id) {
+        Task task = tasks.get(id);
+
+        return task;
+    }
+
+    public Subtask getSubtask(int id) {
+        Subtask subtask = subtasks.get(id);
+
+        return subtask;
     }
 }

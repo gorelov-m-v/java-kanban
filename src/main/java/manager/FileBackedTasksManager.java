@@ -4,6 +4,7 @@ import model.Epic;
 import model.Subtask;
 import model.Task;
 import model.constant.TaskStatus;
+import model.exception.ManagerIntersectionException;
 import model.exception.ManagerSaveException;
 
 import java.io.*;
@@ -59,11 +60,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         long duration = Long.parseLong(attributes[7]);
 
         if (type.equals("EPIC")) {
-            return new Epic(id, title, description, status);
+            return new Epic(id, title, description, status, startTime, duration);
         } else if (type.equals("TASK")) {
             return new Task(id, title, description, status, startTime, duration);
         } else {
-            return new Subtask(id, title, description, epicId, status);
+            return new Subtask(id, title, description, epicId, status, startTime, duration);
         }
     }
 
@@ -129,7 +130,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         FileBackedTasksManager fileManager = new FileBackedTasksManager(file);
         List<String> lines = fileManager.loadFileToBuffer();
 
-        if (lines.size() == 2) {
+        if (lines.size() == 2 ||  lines.size() == 3) {
             for (int i = 0; i < lines.size(); i++) {
                 if (i < lines.size() - 1) {
                     Task task = fileManager.taskFromCSV(lines.get(i));
@@ -167,8 +168,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 }
             }
         }
-
-
         fileManager.subtasks.values().forEach(s -> {
             fileManager.getEpicById(s.getEpicId()).getSubtasks().add(s.getId());
         });
@@ -183,17 +182,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     @Override
     public void createSubtask(Subtask subtask, int epicId) {
-        subtask.setId(getNewId());
-
-        getEpic(epicId).addSubtask(subtask.getId());
-        subtasks.put(subtask.getId(), subtask);
+        super.createSubtask(subtask, epicId);
         save();
     }
 
     @Override
     public void createEpic(Epic epic) {
-        epic.setId(getNewId());
-        epics.put(epic.getId(), epic);
+        super.createEpic(epic);
         save();
     }
 
@@ -310,25 +305,35 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 //        Epic epic1 = new Epic("Title1", "Description1");
 //        fb.createEpic(epic1);
 //
-        Task task1 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(50, MINUTES), 40);
-        Task task2 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(100, MINUTES), 40);
-        Task task3 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(150, MINUTES), 40);
-        Task task4 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(200, MINUTES), 40);
+//        Task task1 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(50, MINUTES), 40);
+//        Task task2 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(100, MINUTES), 40);
+//        Task task3 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(150, MINUTES), 40);
+//        Task task4 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(200, MINUTES), 40);
+//
+//        fb.createTask(task1);
+//        fb.createTask(task2);
+//        fb.createTask(task3);
+//        fb.createTask(task4);
+//
+//        fb.getTaskById(3);
+//        fb.getTaskById(4);
+//        fb.getTaskById(1);
+//        fb.getTaskById(2);
+//
+//
 
-        fb.createTask(task1);
-        fb.createTask(task2);
-        fb.createTask(task3);
-        fb.createTask(task4);
-
-        fb.getTaskById(3);
-        fb.getTaskById(4);
-        fb.getTaskById(1);
-        fb.getTaskById(2);
-
-
+        Epic epic = new Epic("TestTaskTitle", "TestTaskDescription");
+        fb.createEpic(epic);
+        Subtask subtask1 = new Subtask(
+                "TestSubtaskTitle", "TestSubtaskDescription", 1,
+                Instant.now(), 30);
+        fb.createSubtask(subtask1, 1);
         FileBackedTasksManager fbNew = load(file);
-        System.out.println(fbNew.getAllTasks());
-        System.out.println(fbNew.historyManager.getHistory());
+
+        System.out.println(fbNew.getAllEpics());
+        System.out.println(fbNew.getAllSubtasks());
+//        System.out.println(fbNew.getAllTasks());
+//        System.out.println(fbNew.historyManager.getHistory());
 
 
 //

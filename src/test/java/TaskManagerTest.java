@@ -534,7 +534,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 Instant.now(), 30);
         manager.createSubtask(subtask1, 1);
 
-        assertEquals(null, manager.getEpicBySubtaskId(10));
+        assertNull(manager.getEpicBySubtaskId(10));
     }
-
 }
