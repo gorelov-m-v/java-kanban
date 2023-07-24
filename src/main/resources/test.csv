@@ -1,7 +1,5 @@
 id,type,name,status,description,epicId
-1,TASK,TestTaskTitle,NEW,TestTaskDescription,,2023-07-24T00:40:14.602841600Z,40,
-2,TASK,TestTaskTitle,NEW,TestTaskDescription,,2023-07-24T01:30:14.603839900Z,40,
-3,TASK,TestTaskTitle,NEW,TestTaskDescription,,2023-07-24T02:20:14.603839900Z,40,
-4,TASK,TestTaskTitle,NEW,TestTaskDescription,,2023-07-24T03:10:14.603839900Z,40
+1,EPIC,TestTaskTitle,NEW,TestTaskDescription,,2023-07-24T17:56:57.268780100Z,30,
+2,SUBTASK,TestSubtaskTitle,NEW,TestSubtaskDescription,1,2023-07-24T17:56:57.268780100Z,30
 
-3,1
+2

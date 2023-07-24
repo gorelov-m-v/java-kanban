@@ -7,7 +7,6 @@ import model.constant.TaskStatus;
 import model.constant.TaskType;
 import model.exception.ManagerIntersectionException;
 import model.exception.ManagerValidateException;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -75,7 +74,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getSubtaskById(int id) {
+    public Subtask getSubtaskById(int id) {
         Subtask subtask = subtasks.get(id);
         Optional<Task> optionalTask = Optional.ofNullable(subtasks.get(id));
 
@@ -96,7 +95,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createTask(Task task) {
         try {
-            checkIntersection(task);
+            checkCreateIntersection(task);
             task.setId(getNewId());
             tasks.put(task.getId(), task);
         } catch (ManagerIntersectionException e) {
@@ -114,7 +113,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createSubtask(Subtask subtask, int epicId) {
         try {
-            checkIntersection(subtask);
+            checkCreateIntersection(subtask);
             subtask.setId(getNewId());
             Epic epic = getEpic(epicId);
             epic.addSubtask(subtask.getId());
@@ -137,7 +136,7 @@ public class InMemoryTaskManager implements TaskManager {
             }
             try {
                 newTaskData.setId(taskId);
-                checkIntersectionInUpdate(newTaskData);
+                checkUpdateIntersection(newTaskData);
 
                 tasks.put(taskId, newTaskData);
             } catch (ManagerIntersectionException e) {
@@ -173,7 +172,7 @@ public class InMemoryTaskManager implements TaskManager {
             }
             try {
                 newSubtaskData.setId(subtaskId);
-                checkIntersectionInUpdate(newSubtaskData);
+                checkUpdateIntersection(newSubtaskData);
                 Optional<Epic> epicOptional = Optional.ofNullable(getEpicBySubtaskId(subtaskId));
 
                 epicOptional.ifPresent(e -> {
@@ -297,7 +296,7 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<>(prioritizedTasks);
     }
 
-    public void checkIntersection(Task task) {
+    public void checkCreateIntersection(Task task) {
         Optional<Integer> intersectionTask = Stream.of(getAllSubtasks(), getAllTasks())
                 .flatMap(List::stream)
                 .filter(t ->
@@ -313,7 +312,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    public void checkIntersectionInUpdate(Task task) {
+    public void checkUpdateIntersection(Task task) {
         List<Subtask> tempSubtasks = getAllSubtasks();
         List<Task> tempTasks = getAllTasks();
 

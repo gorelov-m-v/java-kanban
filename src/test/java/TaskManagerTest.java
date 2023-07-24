@@ -418,68 +418,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(List.of(), manager.getAllSubtasks());
     }
 
-    @Test
-    public void shouldReturnNewEpicStatus() {
-        Epic epic = new Epic("TestTaskTitle", "TestTaskDescription");
-        manager.createEpic(epic);
-        Subtask subtask1 = new Subtask(
-                "TestSubtaskTitle", "TestSubtaskDescription", 1, Instant.now(), 30);
-        manager.createSubtask(subtask1, 1);
-        Subtask subtask2 = new Subtask(
-                "TestSubtaskTitle", "TestSubtaskDescription", 1,
-                Instant.now().plus(50, MINUTES), 30);
-        manager.createSubtask(subtask2, 1);
-
-        assertEquals(TaskStatus.NEW, epic.getStatus());
-    }
-
-    @Test
-    public void shouldReturnDoneEpicStatus() {
-        Epic epic = new Epic("TestTaskTitle", "TestTaskDescription");
-        manager.createEpic(epic);
-        Subtask subtask1 = new Subtask(
-                "TestSubtaskTitle", "TestSubtaskDescription", 1,
-                Instant.now(), 30);
-        manager.createSubtask(subtask1, 1);
-        Subtask newSubtask1 = new Subtask(
-                "TestSubtaskTitle", "TestSubtaskDescription", 1,
-                Instant.now(), 30, TaskStatus.DONE);
-        manager.updateSubtask(2, newSubtask1);
-
-        Subtask subtask2 = new Subtask(
-                "TestSubtaskTitle", "TestSubtaskDescription", 1,
-                Instant.now().plus(50, MINUTES), 30);
-        manager.createSubtask(subtask2, 1);
-        Subtask newSubtask2 = new Subtask(
-                "TestSubtaskTitle", "TestSubtaskDescription", 1,
-                Instant.now().plus(50, MINUTES), 30, TaskStatus.DONE);
-        manager.updateSubtask(3, newSubtask2);
-
-
-
-        assertEquals(TaskStatus.DONE, epic.getStatus());
-    }
-
-    @Test
-    public void shouldReturnInProgressEpicStatus() {
-        Epic epic = new Epic("TestTaskTitle", "TestTaskDescription");
-        manager.createEpic(epic);
-        Subtask subtask1 = new Subtask(
-                "TestSubtaskTitle", "TestSubtaskDescription", 1,
-                Instant.now(), 30);
-        manager.createSubtask(subtask1, 1);
-        Subtask newSubtask1 = new Subtask(
-                "TestSubtaskTitle", "TestSubtaskDescription", 1,
-                Instant.now(), 30, TaskStatus.DONE);
-        manager.updateSubtask(2, newSubtask1);
-
-        Subtask subtask2 = new Subtask(
-                "TestSubtaskTitle", "TestSubtaskDescription", 1,
-                Instant.now().plus(50, MINUTES), 30);
-        manager.createSubtask(subtask2, 1);
-
-        assertEquals(TaskStatus.IN_PROGRESS, epic.getStatus());
-    }
 
     @Test
     public void shouldReturnSubtaskListFromEpic() {

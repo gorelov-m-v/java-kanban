@@ -41,6 +41,7 @@ public class Task {
 	public Task(String title, String description) {
 		this.title = title;
 		this.description = description;
+		this.status = TaskStatus.NEW;
 	}
 
 	public Task(int id, String title, String description, TaskStatus status) {
