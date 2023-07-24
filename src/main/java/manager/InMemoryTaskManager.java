@@ -318,9 +318,9 @@ public class InMemoryTaskManager implements TaskManager {
         List<Task> tempTasks = getAllTasks();
 
         if (task.getClass() == Task.class) {
-            tempTasks.remove(task);
+            tempTasks.remove(getTask(task.getId()));
         } else if (task.getClass() == Subtask.class) {
-            tempSubtasks.remove(task);
+            tempSubtasks.remove(getSubtask(task.getId()));
         }
 
         Optional<Integer> intersectionTask = Stream.of(tempSubtasks, tempTasks)

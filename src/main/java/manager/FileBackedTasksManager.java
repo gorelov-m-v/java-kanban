@@ -194,26 +194,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     @Override
     public Task getTaskById(int id) {
-        Task task = tasks.get(id);
-        Optional<Task> optionalTask = Optional.ofNullable(task);
-
-        optionalTask.ifPresent(t -> {
-            historyManager.add(t);
-            save();
-        });
+        Task task = super.getTaskById(id);
+        save();
 
         return task;
     }
 
     @Override
     public Epic getEpicById(int id) {
-        Epic epic = epics.get(id);
-        Optional<Task> optionalTask = Optional.ofNullable(epic);
-
-        optionalTask.ifPresent(s -> {
-            historyManager.add(s);
-            save();
-        });
+        Epic epic = super.getEpicById(id);
+        save();
 
         return epic;
     }
@@ -305,33 +295,40 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 //        Epic epic1 = new Epic("Title1", "Description1");
 //        fb.createEpic(epic1);
 //
-//        Task task1 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(50, MINUTES), 40);
-//        Task task2 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(100, MINUTES), 40);
-//        Task task3 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(150, MINUTES), 40);
-//        Task task4 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(200, MINUTES), 40);
+        Task task1 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(50, MINUTES), 40);
+        Task task2 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(100, MINUTES), 40);
+        Task task3 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(150, MINUTES), 40);
+        Task task4 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(200, MINUTES), 40);
 //
-//        fb.createTask(task1);
-//        fb.createTask(task2);
-//        fb.createTask(task3);
-//        fb.createTask(task4);
+        fb.createTask(task1);
+        fb.createTask(task2);
+        fb.createTask(task3);
+        fb.createTask(task4);
 //
-//        fb.getTaskById(3);
+        fb.getTaskById(3);
 //        fb.getTaskById(4);
-//        fb.getTaskById(1);
+        fb.getTaskById(1);
 //        fb.getTaskById(2);
 //
+        FileBackedTasksManager fbNew = load(file);
+////
+////        System.out.println(fbNew.getAllEpics());
+////        System.out.println(fbNew.getAllSubtasks());
+        System.out.println(fbNew.getAllTasks());
+        System.out.println(fbNew.historyManager.getHistory());
+
 //
 
-        Epic epic = new Epic("TestTaskTitle", "TestTaskDescription");
-        fb.createEpic(epic);
-        Subtask subtask1 = new Subtask(
-                "TestSubtaskTitle", "TestSubtaskDescription", 1,
-                Instant.now(), 30);
-        fb.createSubtask(subtask1, 1);
-        FileBackedTasksManager fbNew = load(file);
-
-        System.out.println(fbNew.getAllEpics());
-        System.out.println(fbNew.getAllSubtasks());
+//        Epic epic = new Epic("TestTaskTitle", "TestTaskDescription");
+//        fb.createEpic(epic);
+//        Subtask subtask1 = new Subtask(
+//                "TestSubtaskTitle", "TestSubtaskDescription", 1,
+//                Instant.now(), 30);
+//        fb.createSubtask(subtask1, 1);
+//        FileBackedTasksManager fbNew = load(file);
+//
+//        System.out.println(fbNew.getAllEpics());
+//        System.out.println(fbNew.getAllSubtasks());
 //        System.out.println(fbNew.getAllTasks());
 //        System.out.println(fbNew.historyManager.getHistory());
 
