@@ -119,7 +119,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void shouldReturnNullWhenGetSubtaskByIdFromEmptySubtasks() {
-        assertEquals(null, manager.getSubtaskById(1));
+        assertNull(manager.getSubtaskById(1));
     }
 
     @Test
