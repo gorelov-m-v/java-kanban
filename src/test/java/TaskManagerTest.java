@@ -2,7 +2,6 @@ import manager.TaskManager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
-import model.constant.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.Instant;
@@ -49,6 +48,17 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(subtask, manager.getAllSubtasks().get(0));
     }
 
+    @Test
+    public void shouldNotCreateSubtaskWhenEpicDoesNotExist() {
+        Epic epic = new Epic("TestTaskTitle", "TestTaskDescription");
+        manager.createEpic(epic);
+
+        Subtask subtask = new Subtask(
+                "TestSubtaskTitle", "TestSubtaskDescription", 1, Instant.now(), 30);
+        manager.createSubtask(subtask, 2);
+
+        assertEquals(0, manager.getAllSubtasks().size());
+    }
     @Test
     public void shouldReturnTaskById() {
         Task task = new Task("TestTaskTitle", "TestTaskDescription", Instant.now(), 40);

@@ -30,6 +30,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getAllEpics() {
+        epics.values().stream().forEach(this::updateEpicTime);
         return new ArrayList<>(epics.values());
     }
 
@@ -113,15 +114,23 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createSubtask(Subtask subtask, int epicId) {
         try {
-            checkCreateIntersection(subtask);
-            subtask.setId(getNewId());
-            Epic epic = getEpic(epicId);
-            epic.addSubtask(subtask.getId());
+            if (epics.keySet().contains(epicId)) {
+                try {
+                    checkCreateIntersection(subtask);
+                    subtask.setId(getNewId());
+                    Epic epic = getEpic(epicId);
+                    epic.addSubtask(subtask.getId());
 
-            subtasks.put(subtask.getId(), subtask);
-            updateEpicTime(epic);
-            checkEpicStatus(epic);
-        } catch (ManagerIntersectionException e) {
+                    subtasks.put(subtask.getId(), subtask);
+                    updateEpicTime(epic);
+                    checkEpicStatus(epic);
+                } catch (ManagerIntersectionException e) {
+                    System.out.println(e.getMessage());
+                }
+            } else {
+                throw new ManagerValidateException(String.format("Epic c id = %d не существует", epicId));
+            }
+        } catch (ManagerValidateException e) {
             System.out.println(e.getMessage());
         }
     }

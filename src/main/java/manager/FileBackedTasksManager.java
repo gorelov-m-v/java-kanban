@@ -56,7 +56,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         TaskStatus status = TaskStatus.valueOf(attributes[3]);
         String description = attributes[4];
         int epicId = type.equals("SUBTASK") ? Integer.parseInt(attributes[5]) : 0;
-        Instant startTime = Instant.parse(attributes[6]);
+        Instant startTime = attributes[6].equals("null") ? null : Instant.parse(attributes[6]);
         long duration = Long.parseLong(attributes[7]);
 
         if (type.equals("EPIC")) {
@@ -126,7 +126,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    private static FileBackedTasksManager load(File file) {
+    public static FileBackedTasksManager load(File file) {
         FileBackedTasksManager fileManager = new FileBackedTasksManager(file);
         List<String> lines = fileManager.loadFileToBuffer();
 
@@ -287,6 +287,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 //////        System.out.println(fbNew.getAllSubtasks());
         System.out.println(fbNew.getAllTasks());
         System.out.println(fbNew.historyManager.getHistory());
+
+        System.out.println(fb.loadFileToBuffer());
 
 //
 
