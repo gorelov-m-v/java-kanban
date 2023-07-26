@@ -8,7 +8,6 @@ import model.constant.TaskStatus;
 import model.constant.TaskType;
 import model.exception.ManagerIntersectionException;
 import model.exception.ManagerValidateException;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -268,6 +267,11 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(prioritizedTasks);
+    }
+
     public int getNewId() {
         return ++i;
     }
@@ -297,12 +301,14 @@ public class InMemoryTaskManager implements TaskManager {
             Instant startTime = epic.getSubtasks().stream()
                     .map(this::getSubtask)
                     .map(Task::getStartTime)
+                    .filter(Objects::nonNull)
                     .min(Instant::compareTo)
                     .orElse(null);
 
             Instant endTime = epic.getSubtasks().stream()
                     .map(this::getSubtask)
                     .map(Task::getEndTime)
+                    .filter(Objects::nonNull)
                     .max(Instant::compareTo)
                     .orElse(null);
 
@@ -338,25 +344,23 @@ public class InMemoryTaskManager implements TaskManager {
         subtask.setEndTime(subtask.getStartTime().plusSeconds(subtask.getDuration() * 60));
     }
 
-    public List<Task> getPrioritizedTasks() {
-        return new ArrayList<>(prioritizedTasks);
-    }
-
     public void checkCreateIntersection(Task task) {
-        Optional<Integer> intersectionTask = Stream.of(getAllSubtasks(), getAllTasks())
-                .flatMap(List::stream)
-                .filter(t -> t.getStartTime() != null)
-                .filter(t ->
-                        task.getStartTime().isAfter(t.getStartTime()) &&
-                        task.getStartTime().isBefore(t.getEndTime()) ||
-                        task.getEndTime().isAfter(t.getStartTime()) &&
-                        task.getEndTime().isBefore(t.getEndTime()))
-                .map(Task::getId)
-                .findFirst();
+        if (task.getStartTime() != null) {
+            Optional<Integer> intersectionTask = Stream.of(getAllSubtasks(), getAllTasks())
+                    .flatMap(List::stream)
+                    .filter(t -> t.getStartTime() != null)
+                    .filter(t ->
+                            task.getStartTime().isAfter(t.getStartTime()) &&
+                                    task.getStartTime().isBefore(t.getEndTime()) ||
+                                    task.getEndTime().isAfter(t.getStartTime()) &&
+                                            task.getEndTime().isBefore(t.getEndTime()))
+                    .map(Task::getId)
+                    .findFirst();
 
-        if (intersectionTask.isPresent()) {
-            throw new ManagerIntersectionException(String.format("Задача, которую вы хотите создать/изменить," +
-                    " пересекается с задачей с id = %s.", intersectionTask.get()));
+            if (intersectionTask.isPresent()) {
+                throw new ManagerIntersectionException(String.format("Задача, которую вы хотите создать/изменить," +
+                        " пересекается с задачей с id = %s.", intersectionTask.get()));
+            }
         }
     }
 

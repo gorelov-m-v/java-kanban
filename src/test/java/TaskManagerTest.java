@@ -484,4 +484,30 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         assertNull(manager.getEpicBySubtaskId(10));
     }
+
+    @Test
+    public void shouldReturnPrioritizedTasks() {
+        Task task1 = new Task("TestTaskTitle", "TestTaskDescription", null, 0);
+        Task task2 = new Task("TestTaskTitle", "TestTaskDescription",
+                Instant.now().plus(100, MINUTES), 40);
+        Task task3 = new Task("TestTaskTitle", "TestTaskDescription",
+                Instant.now().plus(150, MINUTES), 40);
+        Task task4 = new Task("TestTaskTitle", "TestTaskDescription",
+                Instant.now().plus(200, MINUTES), 40);
+        Task task5 = new Task("NewTestTaskTitle", "NewTestTaskDescription",
+                Instant.now().plus(700, MINUTES), 40);
+        Epic epic1 = new Epic("TestTaskTitle", "TestTaskDescription");
+        manager.createEpic(epic1);
+        Subtask subtask1 = new Subtask(
+                "TestSubtaskTitle", "TestSubtaskDescription", 1,
+                null, 0);
+        manager.createSubtask(subtask1, 1);
+        manager.createTask(task1);
+        manager.createTask(task2);
+        manager.createTask(task3);
+        manager.createTask(task4);
+        manager.createTask(task5);
+
+        assertEquals(List.of(task2, task3, task4, task5, subtask1, task1), manager.getPrioritizedTasks());
+    }
 }

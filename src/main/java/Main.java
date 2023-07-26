@@ -20,11 +20,18 @@ public class Main {
         Task task3 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(150, MINUTES), 40);
         Task task4 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(200, MINUTES), 40);
         Task task5 = new Task("NewTestTaskTitle", "NewTestTaskDescription", Instant.now().plus(700, MINUTES), 40);
-//
+        Epic epic1 = new Epic("TestTaskTitle", "TestTaskDescription");
+        taskManager.createEpic(epic1);
+        Subtask subtask1 = new Subtask(
+                "TestSubtaskTitle", "TestSubtaskDescription", 1,
+                Instant.now().plus(2250, MINUTES), 30);
+        taskManager.createSubtask(subtask1, 1);
         taskManager.createTask(task1);
         taskManager.createTask(task2);
         taskManager.createTask(task3);
-        taskManager.getPrioritizedTasks().add(task2);
+
+
+
         System.out.println(taskManager.getAllTasks());
         System.out.println(taskManager.getPrioritizedTasks());
     }
