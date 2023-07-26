@@ -167,6 +167,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         fileManager.subtasks.values().forEach(s -> {
             fileManager.getEpicById(s.getEpicId()).getSubtasks().add(s.getId());
         });
+        fileManager.subtasks.values().forEach(fileManager::updateSubTaskEndTime);
+        fileManager.tasks.values().forEach(fileManager::updateTaskEndTime);
+        fileManager.epics.values().forEach(fileManager::updateEpicTime);
+
         return fileManager;
     }
 

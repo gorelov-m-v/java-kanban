@@ -9,7 +9,6 @@ import java.util.Objects;
 
 public class Epic extends Task {
 	private List<Integer> subtasks = new ArrayList<>();
-	private Instant endTime;
 
 	public Epic(String title, String description) {
 		super(title, description);
@@ -37,15 +36,6 @@ public class Epic extends Task {
 	}
 
 	@Override
-	public Instant getEndTime() {
-		return endTime;
-	}
-
-	public void setEndTime(Instant endTime) {
-		this.endTime = endTime;
-	}
-
-	@Override
 	public String toString() {
 		return "Epic{" +
 				"id=" + getId() +
@@ -67,15 +57,13 @@ public class Epic extends Task {
 
 		Epic epic = (Epic) o;
 
-		if (!Objects.equals(subtasks, epic.subtasks)) return false;
-		return Objects.equals(endTime, epic.endTime);
+		return Objects.equals(subtasks, epic.subtasks);
 	}
 
 	@Override
 	public int hashCode() {
 		int result = super.hashCode();
 		result = 31 * result + (subtasks != null ? subtasks.hashCode() : 0);
-		result = 31 * result + (endTime != null ? endTime.hashCode() : 0);
 		return result;
 	}
 }

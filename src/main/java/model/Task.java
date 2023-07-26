@@ -13,6 +13,7 @@ public class Task {
 	private TaskStatus status;
 	private Instant startTime;
 	private long duration;
+	private Instant endTime;
 
 	public Task(String title, String description, Instant startTime, long duration) {
 		this.title = title;
@@ -95,9 +96,11 @@ public class Task {
 	public void setDuration(long duration) {
 		this.duration = duration;
 	}
-
 	public Instant getEndTime() {
-		return startTime.plusSeconds(duration * 60);
+		return endTime;
+	}
+	public void setEndTime(Instant endTime) {
+		this.endTime = endTime;
 	}
 
 	public String getEpicId(Task task) {
@@ -116,6 +119,7 @@ public class Task {
 				", status=" + status +
 				", startTime=" + startTime +
 				", duration=" + duration +
+				", endTime=" + endTime +
 				'}';
 	}
 

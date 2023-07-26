@@ -64,6 +64,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
         manager.createTask(task1);
         Task task2 = new Task("TestTaskTitle", "TestTaskDescription",
                 Instant.now().minus(10, MINUTES), 20);
+        manager.updateTaskEndTime(task2);
 
         final ManagerIntersectionException exception = assertThrows(
                 ManagerIntersectionException.class,
@@ -85,6 +86,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
         manager.createTask(task1);
         Task task2 = new Task("TestTaskTitle", "TestTaskDescription",
                 Instant.now().minus(10, MINUTES), 170);
+        manager.updateTaskEndTime(task2);
 
         assertDoesNotThrow(
                 new Executable() {
@@ -149,6 +151,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
         Task task3 = new Task("TestTaskTitle", "TestTaskDescription",
                 Instant.now().minus(10, MINUTES), 20);
         task3.setId(2);
+        manager.updateTaskEndTime(task3);
 
         final ManagerIntersectionException exception = assertThrows(
                 ManagerIntersectionException.class,
@@ -171,7 +174,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
         Task task3 = new Task("TestTaskTitle", "TestTaskDescription",
                 Instant.now().minus(10, MINUTES), 100);
-        task3.setId(2);
+        manager.createTask(task3);
 
         assertDoesNotThrow(
                 new Executable() {
@@ -292,7 +295,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
         manager.createSubtask(subtask2, 1);
 
         assertEquals(subtask1.getStartTime() ,epic.getStartTime());
-        assertEquals(70 ,epic.getDuration());
+        assertEquals(60 ,epic.getDuration());
         assertEquals(subtask2.getEndTime() ,epic.getEndTime());
     }
 }
