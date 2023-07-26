@@ -1,5 +1,5 @@
 id,type,name,status,description,epicId
 1,EPIC,TestTaskTitle,NEW,TestTaskDescription,,null,0,
-2,SUBTASK,TestSubtaskTitle,NEW,TestSubtaskDescription,1,2023-07-25T20:34:32.801849200Z,30
+2,SUBTASK,TestSubtaskTitle,NEW,TestSubtaskDescription,1,2023-07-26T09:47:11.269611400Z,30
 
 1

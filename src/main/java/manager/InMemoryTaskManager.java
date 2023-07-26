@@ -309,9 +309,10 @@ public class InMemoryTaskManager implements TaskManager {
         Optional<Integer> intersectionTask = Stream.of(getAllSubtasks(), getAllTasks())
                 .flatMap(List::stream)
                 .filter(t ->
-                        task.getStartTime().isAfter(t.getStartTime()) && task.getStartTime().isBefore(t.getEndTime())
-                                ||
-                                task.getEndTime().isAfter(t.getStartTime()) && task.getEndTime().isBefore(t.getEndTime()))
+                        task.getStartTime().isAfter(t.getStartTime()) &&
+                        task.getStartTime().isBefore(t.getEndTime()) ||
+                        task.getEndTime().isAfter(t.getStartTime()) &&
+                        task.getEndTime().isBefore(t.getEndTime()))
                 .map(Task::getId)
                 .findFirst();
 
@@ -334,9 +335,10 @@ public class InMemoryTaskManager implements TaskManager {
         Optional<Integer> intersectionTask = Stream.of(tempSubtasks, tempTasks)
                 .flatMap(List::stream)
                 .filter(t ->
-                        task.getStartTime().isAfter(t.getStartTime()) && task.getStartTime().isBefore(t.getEndTime())
-                                ||
-                                task.getEndTime().isAfter(t.getStartTime()) && task.getEndTime().isBefore(t.getEndTime()))
+                        task.getStartTime().isAfter(t.getStartTime()) &&
+                        task.getStartTime().isBefore(t.getEndTime()) ||
+                        task.getEndTime().isAfter(t.getStartTime()) &&
+                        task.getEndTime().isBefore(t.getEndTime()))
                 .map(Task::getId)
                 .findFirst();
 
@@ -347,19 +349,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public Epic getEpic(int id) {
-        Epic epic = epics.get(id);
-
-        return epic;
+        return epics.get(id);
     }
     public Task getTask(int id) {
-        Task task = tasks.get(id);
+        return tasks.get(id);
 
-        return task;
     }
 
     public Subtask getSubtask(int id) {
-        Subtask subtask = subtasks.get(id);
-
-        return subtask;
+        return subtasks.get(id);
     }
 }
