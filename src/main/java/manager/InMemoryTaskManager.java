@@ -1,6 +1,7 @@
 package manager;
 
 import model.Epic;
+import model.StartTimeComparator;
 import model.Subtask;
 import model.Task;
 import model.constant.TaskStatus;
@@ -19,7 +20,7 @@ public class InMemoryTaskManager implements TaskManager {
     public final Map<Integer, Task> tasks = new HashMap<>();
     public final Map<Integer, Epic> epics = new HashMap<>();
     public final Map<Integer, Subtask> subtasks = new HashMap<>();
-    protected Set<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+    protected Set<Task> prioritizedTasks = new TreeSet<>(new StartTimeComparator());
     private int i = 0;
 
 
@@ -344,6 +345,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void checkCreateIntersection(Task task) {
         Optional<Integer> intersectionTask = Stream.of(getAllSubtasks(), getAllTasks())
                 .flatMap(List::stream)
+                .filter(t -> t.getStartTime() != null)
                 .filter(t ->
                         task.getStartTime().isAfter(t.getStartTime()) &&
                         task.getStartTime().isBefore(t.getEndTime()) ||
@@ -370,6 +372,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         Optional<Integer> intersectionTask = Stream.of(tempSubtasks, tempTasks)
                 .flatMap(List::stream)
+                .filter(t -> t.getStartTime() != null)
                 .filter(t ->
                         task.getStartTime().isAfter(t.getStartTime()) &&
                         task.getStartTime().isBefore(t.getEndTime()) ||

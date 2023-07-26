@@ -5,6 +5,8 @@ import model.Subtask;
 import model.Task;
 import model.constant.TaskStatus;
 import model.exception.ManagerSaveException;
+import org.w3c.dom.ls.LSOutput;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -261,34 +263,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 //        Epic epic1 = new Epic("Title1", "Description1");
 //        fb.createEpic(epic1);
 //
-        Task task1 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(50, MINUTES), 40);
-        Task task2 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(100, MINUTES), 40);
-        Task task3 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(150, MINUTES), 40);
-        Task task4 = new Task("TestTaskTitle", "TestTaskDescription", Instant.now().plus(200, MINUTES), 40);
-        Task task5 = new Task("NewTestTaskTitle", "NewTestTaskDescription", Instant.now().plus(700, MINUTES), 40);
-//
-        fb.createTask(task1);
-//        fb.createTask(task2);
-//        fb.createTask(task3);
-//        fb.createTask(task4);
-        fb.updateTask(1, task5);
 
-//        System.out.println(fb.getTask(1));
-
-//
-//        fb.getTaskById(3);
-//        fb.getTaskById(4);
-        fb.getTaskById(1);
-//        fb.getTaskById(2);
-//
-        FileBackedTasksManager fbNew = load(file);
-//////
-//////        System.out.println(fbNew.getAllEpics());
-//////        System.out.println(fbNew.getAllSubtasks());
-        System.out.println(fbNew.getAllTasks());
-        System.out.println(fbNew.historyManager.getHistory());
-
-        System.out.println(fb.loadFileToBuffer());
 
 //
 
