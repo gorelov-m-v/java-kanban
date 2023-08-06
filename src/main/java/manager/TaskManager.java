@@ -36,4 +36,6 @@ public interface TaskManager {
     TaskType getType(Task task);
     Epic getEpicBySubtaskId(int subtaskId);
     public List<Task> getPrioritizedTasks();
+
+    Task getTask(int i);
 }

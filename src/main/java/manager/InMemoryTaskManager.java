@@ -13,6 +13,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static model.constant.TaskStatus.NEW;
+
 public class InMemoryTaskManager implements TaskManager {
     public HistoryManager historyManager = Managers.getDefaultHistoryManager();
 
@@ -98,16 +100,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createTask(Task task) {
-        try {
+    public void createTask(Task task) throws ManagerIntersectionException{
             updateTaskEndTime(task);
             checkCreateIntersection(task);
             task.setId(getNewId());
+            task.setStatus(NEW);
             tasks.put(task.getId(), task);
             prioritizedTasks.add(task);
-        } catch (ManagerIntersectionException e) {
-            System.out.println(e.getMessage());
-        }
     }
 
     @Override
@@ -284,11 +283,11 @@ public class InMemoryTaskManager implements TaskManager {
                 .collect(Collectors.toList());
 
 
-        boolean statusNew = subtaskStatuses.stream().allMatch(s -> s.equals(TaskStatus.NEW));
+        boolean statusNew = subtaskStatuses.stream().allMatch(s -> s.equals(NEW));
         boolean statusDone = subtaskStatuses.stream().allMatch(s -> s.equals(TaskStatus.DONE));
 
         if (statusNew) {
-            epic.setStatus(TaskStatus.NEW);
+            epic.setStatus(NEW);
         } else if (statusDone) {
             epic.setStatus(TaskStatus.DONE);
         } else {
@@ -351,9 +350,11 @@ public class InMemoryTaskManager implements TaskManager {
                     .filter(t -> t.getStartTime() != null)
                     .filter(t ->
                             task.getStartTime().isAfter(t.getStartTime()) &&
-                                    task.getStartTime().isBefore(t.getEndTime()) ||
-                                    task.getEndTime().isAfter(t.getStartTime()) &&
-                                            task.getEndTime().isBefore(t.getEndTime()))
+                                task.getStartTime().isBefore(t.getEndTime()) ||
+                            task.getEndTime().isAfter(t.getStartTime()) &&
+                                task.getEndTime().isBefore(t.getEndTime()) ||
+                            (task.getStartTime().equals(t.getStartTime()) &
+                                task.getEndTime().equals(t.getEndTime())))
                     .map(Task::getId)
                     .findFirst();
 
@@ -397,7 +398,6 @@ public class InMemoryTaskManager implements TaskManager {
     public Task getTask(int id) {
         return tasks.get(id);
     }
-
     public Subtask getSubtask(int id) {
         return subtasks.get(id);
     }

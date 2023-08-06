@@ -1,3 +1,4 @@
+import com.google.gson.Gson;
 import manager.InMemoryTaskManager;
 import model.Epic;
 import model.Subtask;
@@ -30,9 +31,13 @@ public class Main {
         taskManager.createTask(task2);
         taskManager.createTask(task3);
 
+        Gson gson = new Gson();
+        String taskToString = gson.toJson(task1);
+        System.out.println(taskToString);
+        System.out.println(Instant.now().plus(100, MINUTES));
 
-
-        System.out.println(taskManager.getAllTasks());
-        System.out.println(taskManager.getPrioritizedTasks());
+//
+//        System.out.println(taskManager.getAllTasks());
+//        System.out.println(taskManager.getPrioritizedTasks());
     }
 }

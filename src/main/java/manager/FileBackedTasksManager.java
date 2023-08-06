@@ -5,8 +5,6 @@ import model.Subtask;
 import model.Task;
 import model.constant.TaskStatus;
 import model.exception.ManagerSaveException;
-import org.w3c.dom.ls.LSOutput;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,7 +13,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
     private static final Path PATH = Path.of(
@@ -254,52 +251,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         save();
     }
 
-    public static void main(String[] args) {
-
-        final Path PATH = Path.of("src/main/resources/test.csv");
-        File file = new File(String.valueOf(PATH));
-        FileBackedTasksManager fb = new FileBackedTasksManager(file);
-//
-//        Epic epic1 = new Epic("Title1", "Description1");
-//        fb.createEpic(epic1);
-//
-
-
-//
-
-//        Epic epic = new Epic("TestTaskTitle", "TestTaskDescription");
-//        fb.createEpic(epic);
-//        Subtask subtask1 = new Subtask(
-//                "TestSubtaskTitle", "TestSubtaskDescription", 1,
-//                Instant.now(), 30);
-//        fb.createSubtask(subtask1, 1);
-//        FileBackedTasksManager fbNew = load(file);
-//
-//        System.out.println(fbNew.getAllEpics());
-//        System.out.println(fbNew.getAllSubtasks());
-//        System.out.println(fbNew.getAllTasks());
-//        System.out.println(fbNew.historyManager.getHistory());
-
-
-//
-//        Epic epic2 = new Epic("Title2", "Description2");
-//        fb.createEpic(epic2);
-//
-//        Subtask subtask1 = new Subtask("Title1", "Title1", epic1.getId());
-//        Subtask subtask2 = new Subtask("Title2", "Title2", epic1.getId());
-//        Subtask subtask3 = new Subtask("Title3", "Title3", epic1.getId());
-//        fb.createSubtask(subtask1, epic1.getId());
-//        fb.createSubtask(subtask2, epic1.getId());
-//        fb.createSubtask(subtask3, epic1.getId());
-//
-//        fb.getEpicById(1);
-//        fb.getSubtaskById(4);
-//        fb.getTaskById(2);
-//
-//        System.out.println(fb.getEpic(1));
-//
-//        FileBackedTasksManager fbNew = load(file);
-//        System.out.println(fbNew.getEpic(1));
-////        System.out.println(fbNew.historyManager.getHistory());
+    public Task getTask(int id) {
+        return tasks.get(id);
     }
+
 }
