@@ -43,18 +43,34 @@ public class TaskHandler implements HttpHandler {
             case "POST":
                 InputStream inputStream = exchange.getRequestBody();
                 String requestBody = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
-                Response createResponse = createTask(requestBody);
+                if (isUpdate(requestBody)) {
+                    Response updateResponse = updateTask(requestBody);
 
-                Headers headers = exchange.getResponseHeaders();
-                headers.set("Content-Type", "application/json");
-                exchange.sendResponseHeaders(createResponse.getCode(), 0);
+                    Headers headers = exchange.getResponseHeaders();
+                    headers.set("Content-Type", "application/json");
+                    exchange.sendResponseHeaders(updateResponse.getCode(), 0);
 
-                try (OutputStream os = exchange.getResponseBody()) {
-                    os.write(createResponse.getResponse().getBytes());
-                } finally {
-                    exchange.close();
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(updateResponse.getResponse().getBytes());
+                    } finally {
+                        exchange.close();
+                    }
+                    break;
+                } else {
+                    Response createResponse = createTask(requestBody);
+
+                    Headers headers = exchange.getResponseHeaders();
+                    headers.set("Content-Type", "application/json");
+                    exchange.sendResponseHeaders(createResponse.getCode(), 0);
+
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(createResponse.getResponse().getBytes());
+                    } finally {
+                        exchange.close();
+                    }
+                    break;
                 }
-                break;
+
             case "GET":
                 Response getResponse = getTask(getIdFromPath(exchange));
 
@@ -95,6 +111,10 @@ public class TaskHandler implements HttpHandler {
         return Integer.parseInt(exchange.getRequestURI().getQuery().split("=")[1]);
     }
 
+    private boolean isUpdate(String requestBody) {
+        return requestBody.contains("\"id\": ");
+    }
+
     private Response createTask(String body) {
         if (body.isEmpty()) {
             return new Response(400, "Тело запроса не должно быть пустым.");
@@ -108,6 +128,14 @@ public class TaskHandler implements HttpHandler {
                 return new Response(400, e.getMessage());
             }
         }
+    }
+
+    private Response updateTask(String requestBody) {
+        Task task  = gson.fromJson(requestBody, Task.class);
+        int taskId = task.getId();
+        taskManager.updateTask(taskId, task);
+
+        return new Response(200, gson.toJson(taskManager.getTask(taskId)));
     }
 
     private Response getTask(int id) {
