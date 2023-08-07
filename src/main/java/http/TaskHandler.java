@@ -96,6 +96,10 @@ public class TaskHandler implements HttpHandler {
     private Response getTask(int id) {
         Task task = taskManager.getTask(id);
 
-        return new Response(200, gson.toJson(task));
+        if (task == null) {
+            return new Response(404, String.format("Задача под с id = %d не найдена", id));
+        } else {
+            return new Response(200, gson.toJson(task));
+        }
     }
 }
