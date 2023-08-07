@@ -2,6 +2,7 @@ package http;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.internal.bind.util.ISO8601Utils;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.OptionalInt;
@@ -54,8 +56,7 @@ public class TaskHandler implements HttpHandler {
                 }
                 break;
             case "GET":
-                int id = Integer.parseInt(path.replaceFirst("/tasks/task&id=", ""));
-                Response getResponse = getTask(id);
+                Response getResponse = getTask(getIdFromPath(exchange));
 
                 Headers headers1 = exchange.getResponseHeaders();
                 headers1.set("Content-Type", "application/json");
@@ -67,6 +68,18 @@ public class TaskHandler implements HttpHandler {
                     exchange.close();
                 }
                 break;
+            case "DELETE":
+                Response deleteResponse = deleteTask(getIdFromPath(exchange));
+
+                Headers headers2 = exchange.getResponseHeaders();
+                headers2.set("Content-Type", "application/json");
+                exchange.sendResponseHeaders(deleteResponse.getCode(), 0);
+
+                try (OutputStream os = exchange.getResponseBody()) {
+                    os.write(deleteResponse.getResponse().getBytes());
+                } finally {
+                    exchange.close();
+                }
         }
     }
 
@@ -78,9 +91,13 @@ public class TaskHandler implements HttpHandler {
         return taskManager.getTask(newTaskId.getAsInt());
     }
 
+    private int getIdFromPath(HttpExchange exchange) {
+        return Integer.parseInt(exchange.getRequestURI().getQuery().split("=")[1]);
+    }
+
     private Response createTask(String body) {
         if (body.isEmpty()) {
-            return new Response(400, "Тело запроса не должно быть пустым");
+            return new Response(400, "Тело запроса не должно быть пустым.");
         } else {
             try {
                 Task taskData = gson.fromJson(body, Task.class);
@@ -97,9 +114,20 @@ public class TaskHandler implements HttpHandler {
         Task task = taskManager.getTask(id);
 
         if (task == null) {
-            return new Response(404, String.format("Задача под с id = %d не найдена", id));
+            return new Response(404, String.format("Задача с id = %d не найдена.", id));
         } else {
             return new Response(200, gson.toJson(task));
+        }
+    }
+
+    private Response deleteTask(int id) {
+        Task task = taskManager.getTask(id);
+
+        if (task == null) {
+            return new Response(400, "Задача, которую вы хотите удалить не существует.");
+        } else {
+            taskManager.removeTaskById(id);
+            return new Response(200, String.format("Задача с id = %d удалена.", id));
         }
     }
 }
