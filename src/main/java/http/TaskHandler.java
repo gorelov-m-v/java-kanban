@@ -34,7 +34,7 @@ public class TaskHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         final String method = exchange.getRequestMethod();
-        Response response = null;
+        Response response;
 
         switch (method) {
             case "POST":
@@ -57,7 +57,7 @@ public class TaskHandler implements HttpHandler {
                 }
                 break;
             default:
-                response = new Response(405, "Сорян, метод пока не поддерживается.");
+                response = new Response(405, "Метод не поддерживается. Доступны: GET, POST, DELETE/");
         }
 
         Headers headers2 = exchange.getResponseHeaders();
