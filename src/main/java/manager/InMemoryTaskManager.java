@@ -8,6 +8,7 @@ import model.constant.TaskStatus;
 import model.constant.TaskType;
 import model.exception.ManagerIntersectionException;
 import model.exception.ManagerValidateException;
+
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -100,13 +101,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createTask(Task task) throws ManagerIntersectionException{
-            updateTaskEndTime(task);
-            checkCreateIntersection(task);
-            task.setId(getNewId());
-            task.setStatus(NEW);
-            tasks.put(task.getId(), task);
-            prioritizedTasks.add(task);
+    public void createTask(Task task) throws ManagerIntersectionException {
+        updateTaskEndTime(task);
+        checkCreateIntersection(task);
+        task.setId(getNewId());
+        task.setStatus(NEW);
+        tasks.put(task.getId(), task);
+        prioritizedTasks.add(task);
     }
 
     @Override
@@ -144,24 +145,15 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Integer taskId, Task newTaskData) {
-        try {
-            if (taskId == null) {
-                throw new ManagerValidateException("id не может быть null");
-            } else if (!tasks.containsKey(taskId)) {
-                throw new ManagerValidateException(String.format("Задачи с id = %d, не существует", taskId));
-            }
-            try {
-                updateTaskEndTime(newTaskData);
-                newTaskData.setId(taskId);
-                checkUpdateIntersection(newTaskData);
-
-                tasks.put(taskId, newTaskData);
-            } catch (ManagerIntersectionException e) {
-                System.out.println(e.getMessage());
-            }
-        } catch (ManagerValidateException e) {
-            System.out.println(e.getMessage());
+        if (taskId == null) {
+            throw new ManagerValidateException("id не может быть null");
+        } else if (!tasks.containsKey(taskId)) {
+            throw new ManagerValidateException(String.format("Задачи с id = %d, не существует", taskId));
         }
+        updateTaskEndTime(newTaskData);
+        newTaskData.setId(taskId);
+        checkUpdateIntersection(newTaskData);
+        tasks.put(taskId, newTaskData);
     }
 
     @Override
@@ -330,7 +322,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public void updateTaskEndTime(Task task) {
-        if(task.getStartTime() == null || task.getDuration() == 0) {
+        if (task.getStartTime() == null || task.getDuration() == 0) {
             return;
         }
         task.setEndTime(task.getStartTime().plusSeconds(task.getDuration() * 60));
@@ -350,11 +342,11 @@ public class InMemoryTaskManager implements TaskManager {
                     .filter(t -> t.getStartTime() != null)
                     .filter(t ->
                             task.getStartTime().isAfter(t.getStartTime()) &&
-                                task.getStartTime().isBefore(t.getEndTime()) ||
-                            task.getEndTime().isAfter(t.getStartTime()) &&
-                                task.getEndTime().isBefore(t.getEndTime()) ||
-                            (task.getStartTime().equals(t.getStartTime()) &
-                                task.getEndTime().equals(t.getEndTime())))
+                                    task.getStartTime().isBefore(t.getEndTime()) ||
+                                    task.getEndTime().isAfter(t.getStartTime()) &&
+                                            task.getEndTime().isBefore(t.getEndTime()) ||
+                                    (task.getStartTime().equals(t.getStartTime()) &
+                                            task.getEndTime().equals(t.getEndTime())))
                     .map(Task::getId)
                     .findFirst();
 
@@ -380,9 +372,9 @@ public class InMemoryTaskManager implements TaskManager {
                 .filter(t -> t.getStartTime() != null)
                 .filter(t ->
                         task.getStartTime().isAfter(t.getStartTime()) &&
-                        task.getStartTime().isBefore(t.getEndTime()) ||
-                        task.getEndTime().isAfter(t.getStartTime()) &&
-                        task.getEndTime().isBefore(t.getEndTime()))
+                                task.getStartTime().isBefore(t.getEndTime()) ||
+                                task.getEndTime().isAfter(t.getStartTime()) &&
+                                        task.getEndTime().isBefore(t.getEndTime()))
                 .map(Task::getId)
                 .findFirst();
 
@@ -395,9 +387,11 @@ public class InMemoryTaskManager implements TaskManager {
     public Epic getEpic(int id) {
         return epics.get(id);
     }
+
     public Task getTask(int id) {
         return tasks.get(id);
     }
+
     public Subtask getSubtask(int id) {
         return subtasks.get(id);
     }

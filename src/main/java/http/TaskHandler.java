@@ -9,6 +9,7 @@ import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
 import model.Task;
 import model.exception.ManagerIntersectionException;
+import model.exception.ManagerValidateException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +71,6 @@ public class TaskHandler implements HttpHandler {
                     }
                     break;
                 }
-
             case "GET":
                 Response getResponse = getTask(getIdFromPath(exchange));
 
@@ -131,11 +131,15 @@ public class TaskHandler implements HttpHandler {
     }
 
     private Response updateTask(String requestBody) {
-        Task task  = gson.fromJson(requestBody, Task.class);
-        int taskId = task.getId();
-        taskManager.updateTask(taskId, task);
+        try {
+            Task task  = gson.fromJson(requestBody, Task.class);
+            int taskId = task.getId();
+            taskManager.updateTask(taskId, task);
 
-        return new Response(200, gson.toJson(taskManager.getTask(taskId)));
+            return new Response(200, gson.toJson(taskManager.getTask(taskId)));
+        } catch (ManagerValidateException e) {
+            return new Response(404, e.getMessage());
+        }
     }
 
     private Response getTask(int id) {
