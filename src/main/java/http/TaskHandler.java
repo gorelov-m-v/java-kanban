@@ -2,7 +2,6 @@ package http;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.bind.util.ISO8601Utils;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -10,15 +9,12 @@ import manager.TaskManager;
 import model.Task;
 import model.exception.ManagerIntersectionException;
 import model.exception.ManagerValidateException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.OptionalInt;
 
 public class TaskHandler implements HttpHandler {
@@ -39,63 +35,38 @@ public class TaskHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         final String method = exchange.getRequestMethod();
         final String path = exchange.getRequestURI().getPath();
+        Response response = null;
 
         switch (method) {
             case "POST":
                 InputStream inputStream = exchange.getRequestBody();
                 String requestBody = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
                 if (isUpdate(requestBody)) {
-                    Response updateResponse = updateTask(requestBody);
-
-                    Headers headers = exchange.getResponseHeaders();
-                    headers.set("Content-Type", "application/json");
-                    exchange.sendResponseHeaders(updateResponse.getCode(), 0);
-
-                    try (OutputStream os = exchange.getResponseBody()) {
-                        os.write(updateResponse.getResponse().getBytes());
-                    } finally {
-                        exchange.close();
-                    }
-                    break;
+                    response = updateTask(requestBody);
                 } else {
-                    Response createResponse = createTask(requestBody);
-
-                    Headers headers = exchange.getResponseHeaders();
-                    headers.set("Content-Type", "application/json");
-                    exchange.sendResponseHeaders(createResponse.getCode(), 0);
-
-                    try (OutputStream os = exchange.getResponseBody()) {
-                        os.write(createResponse.getResponse().getBytes());
-                    } finally {
-                        exchange.close();
-                    }
-                    break;
-                }
-            case "GET":
-                Response getResponse = getTask(getIdFromPath(exchange));
-
-                Headers headers1 = exchange.getResponseHeaders();
-                headers1.set("Content-Type", "application/json");
-                exchange.sendResponseHeaders(getResponse.getCode(), 0);
-
-                try (OutputStream os = exchange.getResponseBody()) {
-                    os.write(getResponse.getResponse().getBytes());
-                } finally {
-                    exchange.close();
+                    response = createTask(requestBody);
                 }
                 break;
+            case "GET":
+                response = getTask(getIdFromPath(exchange));
+                break;
             case "DELETE":
-                Response deleteResponse = deleteTask(getIdFromPath(exchange));
-
-                Headers headers2 = exchange.getResponseHeaders();
-                headers2.set("Content-Type", "application/json");
-                exchange.sendResponseHeaders(deleteResponse.getCode(), 0);
-
-                try (OutputStream os = exchange.getResponseBody()) {
-                    os.write(deleteResponse.getResponse().getBytes());
-                } finally {
-                    exchange.close();
+                if (isTotalDelete(exchange)) {
+                    response = deleteAllTasks();
+                } else {
+                    response = deleteTask(getIdFromPath(exchange));
                 }
+                break;
+        }
+
+        Headers headers2 = exchange.getResponseHeaders();
+        headers2.set("Content-Type", "application/json");
+        exchange.sendResponseHeaders(response.getCode(), 0);
+
+        try (OutputStream os = exchange.getResponseBody()) {
+            os.write(response.getResponse().getBytes());
+        } finally {
+            exchange.close();
         }
     }
 
@@ -113,6 +84,10 @@ public class TaskHandler implements HttpHandler {
 
     private boolean isUpdate(String requestBody) {
         return requestBody.contains("\"id\": ");
+    }
+
+    private boolean isTotalDelete(HttpExchange exchange) {
+        return exchange.getRequestURI().getQuery() == null;
     }
 
     private Response createTask(String body) {
@@ -161,5 +136,10 @@ public class TaskHandler implements HttpHandler {
             taskManager.removeTaskById(id);
             return new Response(200, String.format("Задача с id = %d удалена.", id));
         }
+    }
+
+    private Response deleteAllTasks() {
+        taskManager.removeAllTasks();
+        return new Response(200, "Все задачи удалены.");
     }
 }
