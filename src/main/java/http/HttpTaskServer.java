@@ -15,7 +15,6 @@ public class HttpTaskServer {
 
     private static final int PORT = 8080;
     HttpServer httpServer;
-    HistoryManager historyManager = Managers.getDefaultHistoryManager();
     private static final Path PATH = Path.of(
             "src" + File.separator +
                     "main" + File.separator +
@@ -24,6 +23,7 @@ public class HttpTaskServer {
     private File file = new File(String.valueOf(PATH));
     TaskManager taskManager = new FileBackedTasksManager(file);
 
+
     public static void main(String[] args) throws IOException {
         HttpTaskServer httpTaskServer = new HttpTaskServer();
     }
@@ -31,7 +31,7 @@ public class HttpTaskServer {
         this.httpServer = HttpServer.create();
         this.httpServer.bind(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new PrioritizedTasksHandler(taskManager));
-//        httpServer.createContext("/tasks/history", new HistoryHandler());
+        httpServer.createContext("/tasks/history", new HistoryHandler(taskManager));
         httpServer.createContext("/tasks/task", new TaskHandler(taskManager));
 //        httpServer.createContext("/tasks/subtask", new SubtaskHandler());
 //        httpServer.createContext("/tasks/epic", new EpicHandler());

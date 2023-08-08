@@ -57,7 +57,7 @@ public class TaskHandler implements HttpHandler {
                 }
                 break;
             default:
-                response = new Response(405, "Метод не поддерживается. Доступны: GET, POST, DELETE/");
+                response = new Response(405, "Метод не поддерживается. Доступны: GET, POST, DELETE");
         }
 
         Headers headers2 = exchange.getResponseHeaders();
@@ -119,7 +119,7 @@ public class TaskHandler implements HttpHandler {
     }
 
     private Response getTask(int id) {
-        Task task = taskManager.getTask(id);
+        Task task = taskManager.getTaskById(id);
 
         if (task == null) {
             return new Response(404, String.format("Задача с id = %d не найдена.", id));

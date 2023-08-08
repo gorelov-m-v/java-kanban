@@ -251,6 +251,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         save();
     }
 
+    @Override
+    public List<Task> getHistory() {
+        return super.getHistory();
+    }
+
     public Task getTask(int id) {
         return tasks.get(id);
     }

@@ -263,6 +263,11 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<>(prioritizedTasks);
     }
 
+    @Override
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
+    }
+
     public int getNewId() {
         return ++i;
     }
