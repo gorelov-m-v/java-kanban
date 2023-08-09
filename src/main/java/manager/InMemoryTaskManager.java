@@ -169,33 +169,25 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubtask(Integer subtaskId, Subtask newSubtaskData) {
-        try {
-            if (subtaskId == null) {
-                throw new ManagerValidateException("id не может быть null");
-            } else if (!subtasks.containsKey(subtaskId)) {
-                throw new ManagerValidateException(String.format("Подзадачи с id = %d, не существует", subtaskId));
-            }
-            try {
-                updateSubTaskEndTime(newSubtaskData);
-                newSubtaskData.setId(subtaskId);
-                checkUpdateIntersection(newSubtaskData);
-                Optional<Epic> epicOptional = Optional.ofNullable(getEpicBySubtaskId(subtaskId));
-
-                epicOptional.ifPresent(e -> {
-                    subtasks.remove(subtaskId);
-                    subtasks.put(subtaskId, newSubtaskData);
-
-                    Epic epic = getEpicBySubtaskId(subtaskId);
-
-                    updateEpicTime(epic);
-                    checkEpicStatus(epic);
-                });
-            } catch (ManagerIntersectionException e) {
-                System.out.println(e.getMessage());
-            }
-        } catch (ManagerValidateException e) {
-            System.out.println(e.getMessage());
+        if (subtaskId == null) {
+            throw new ManagerValidateException("id не может быть null");
+        } else if (!subtasks.containsKey(subtaskId)) {
+            throw new ManagerValidateException(String.format("Подзадачи с id = %d, не существует", subtaskId));
         }
+        updateSubTaskEndTime(newSubtaskData);
+        newSubtaskData.setId(subtaskId);
+        checkUpdateIntersection(newSubtaskData);
+        Optional<Epic> epicOptional = Optional.ofNullable(getEpicBySubtaskId(subtaskId));
+
+        epicOptional.ifPresent(e -> {
+            subtasks.remove(subtaskId);
+            subtasks.put(subtaskId, newSubtaskData);
+
+            Epic epic = getEpicBySubtaskId(subtaskId);
+
+            updateEpicTime(epic);
+            checkEpicStatus(epic);
+        });
     }
 
     @Override

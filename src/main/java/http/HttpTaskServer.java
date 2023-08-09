@@ -2,10 +2,7 @@ package http;
 
 import com.sun.net.httpserver.HttpServer;
 import manager.FileBackedTasksManager;
-import manager.HistoryManager;
-import manager.Managers;
 import manager.TaskManager;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -33,8 +30,8 @@ public class HttpTaskServer {
         httpServer.createContext("/tasks", new PrioritizedTasksHandler(taskManager));
         httpServer.createContext("/tasks/history", new HistoryHandler(taskManager));
         httpServer.createContext("/tasks/task", new TaskHandler(taskManager));
-//        httpServer.createContext("/tasks/subtask", new SubtaskHandler());
-//        httpServer.createContext("/tasks/epic", new EpicHandler());
+        httpServer.createContext("/tasks/subtask", new SubtaskHandler(taskManager));
+        httpServer.createContext("/tasks/epic", new EpicHandler(taskManager));
         httpServer.start();
 
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");

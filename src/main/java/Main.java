@@ -8,6 +8,7 @@ import model.constant.TaskStatus;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 
@@ -40,8 +41,10 @@ public class Main {
 ////        System.out.println(taskManager.getAllTasks());
 ////        System.out.println(taskManager.getPrioritizedTasks());
 
-        String path = "/tasks/task/?id=1";
+        String path = "/tasks/subtask/epic/?id=1";
 
-        System.out.println(Integer.parseInt(path.replaceFirst("/tasks/task/\\?id=", "")));
+        boolean isGetEpicSubtasks = Pattern.matches("^/tasks/subtask/epic/\\?id=\\d+$", path);
+
+        System.out.println(isGetEpicSubtasks);
     }
 }

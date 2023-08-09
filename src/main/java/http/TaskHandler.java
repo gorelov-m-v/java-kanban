@@ -36,10 +36,11 @@ public class TaskHandler implements HttpHandler {
         final String method = exchange.getRequestMethod();
         Response response;
 
+        InputStream inputStream = exchange.getRequestBody();
+        String requestBody = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
+
         switch (method) {
             case "POST":
-                InputStream inputStream = exchange.getRequestBody();
-                String requestBody = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
                 if (isUpdate(requestBody)) {
                     response = updateTask(requestBody);
                 } else {
@@ -107,14 +108,18 @@ public class TaskHandler implements HttpHandler {
     }
 
     private Response updateTask(String requestBody) {
-        try {
-            Task task  = gson.fromJson(requestBody, Task.class);
-            int taskId = task.getId();
-            taskManager.updateTask(taskId, task);
+        if (requestBody.isEmpty()) {
+            return new Response(400, "Тело запроса не должно быть пустым.");
+        } else {
+            try {
+                Task task = gson.fromJson(requestBody, Task.class);
+                int taskId = task.getId();
+                taskManager.updateTask(taskId, task);
 
-            return new Response(200, gson.toJson(taskManager.getTask(taskId)));
-        } catch (ManagerValidateException e) {
-            return new Response(404, e.getMessage());
+                return new Response(200, gson.toJson(taskManager.getTask(taskId)));
+            } catch (ManagerValidateException e) {
+                return new Response(404, e.getMessage());
+            }
         }
     }
 

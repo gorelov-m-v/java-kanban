@@ -8,9 +8,7 @@ import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
 import model.Epic;
 import model.Task;
-import model.exception.ManagerIntersectionException;
 import model.exception.ManagerValidateException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,10 +37,11 @@ public class EpicHandler implements HttpHandler {
         final String method = exchange.getRequestMethod();
         Response response;
 
+        InputStream inputStream = exchange.getRequestBody();
+        String requestBody = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
+
         switch (method) {
             case "POST":
-                InputStream inputStream = exchange.getRequestBody();
-                String requestBody = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
                 if (isUpdate(requestBody)) {
                     response = updateEpic(requestBody);
                 } else {
