@@ -158,17 +158,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateEpic(Integer epicId, Epic newEpic) {
-        try {
-            if (epicId == null) {
-                throw new ManagerValidateException("id не может быть null");
-            } else if (!epics.containsKey(epicId)) {
-                throw new ManagerValidateException(String.format("Эпика с id = %d, не существует", epicId));
-            }
-            newEpic.setId(epicId);
-            epics.put(epicId, newEpic);
-        } catch (ManagerValidateException e) {
-            System.out.println(e.getMessage());
+        if (epicId == null) {
+            throw new ManagerValidateException("id не может быть null");
+        } else if (!epics.containsKey(epicId)) {
+            throw new ManagerValidateException(String.format("Эпика с id = %d, не существует", epicId));
         }
+        newEpic.setId(epicId);
+        epics.put(epicId, newEpic);
     }
 
     @Override
