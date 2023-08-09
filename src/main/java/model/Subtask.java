@@ -4,7 +4,7 @@ import model.constant.TaskStatus;
 import java.time.Instant;
 
 public class Subtask extends Task {
-	private final int epicId;
+	private int epicId;
 
 	public Subtask(String title, String description, int epicId, Instant startTime, long duration) {
 		super(title, description, startTime, duration);
@@ -28,6 +28,10 @@ public class Subtask extends Task {
 
 	public int getEpicId() {
 		return epicId;
+	}
+
+	public void setEpicId(int epicId) {
+		this.epicId = epicId;
 	}
 
 	@Override

@@ -116,8 +116,8 @@ public class InMemoryTaskManager implements TaskManager {
     public void createEpic(Epic epic) {
         epic.setId(getNewId());
         epic.setStatus(NEW);
+        epic.setSubtasks(new ArrayList<>());
         epics.put(epic.getId(), epic);
-//        checkEpicStatus(epic);
     }
 
     @Override
@@ -128,6 +128,8 @@ public class InMemoryTaskManager implements TaskManager {
                     updateSubTaskEndTime(subtask);
                     checkCreateIntersection(subtask);
                     subtask.setId(getNewId());
+                    subtask.setStatus(NEW);
+                    subtask.setEpicId(epicId);
                     Epic epic = getEpic(epicId);
                     epic.addSubtask(subtask.getId());
 
@@ -168,6 +170,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         newEpic.setId(epicId);
         newEpic.setStatus(getEpic(epicId).getStatus());
+        newEpic.setSubtasks(getEpic(epicId).getSubtasks());
         epics.put(epicId, newEpic);
     }
 
@@ -180,6 +183,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         updateSubTaskEndTime(newSubtaskData);
         newSubtaskData.setId(subtaskId);
+        newSubtaskData.setEpicId(getSubtask(subtaskId).getEpicId());
         checkUpdateIntersection(newSubtaskData);
         Optional<Epic> epicOptional = Optional.ofNullable(getEpicBySubtaskId(subtaskId));
 
@@ -270,7 +274,7 @@ public class InMemoryTaskManager implements TaskManager {
         List<TaskStatus> subtaskStatuses = epic.getSubtasks()
                 .stream()
                 .map(this::getSubtask)
-                .map(Task::getStatus)
+                .map(Subtask::getStatus)
                 .collect(Collectors.toList());
 
 
