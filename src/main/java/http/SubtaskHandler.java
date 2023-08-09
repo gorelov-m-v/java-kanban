@@ -11,7 +11,6 @@ import model.Subtask;
 import model.Task;
 import model.exception.ManagerIntersectionException;
 import model.exception.ManagerValidateException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -181,5 +180,4 @@ public class SubtaskHandler implements HttpHandler {
             return new Response(200, String.format("Подзадача с id = %d удалена.", id));
         }
     }
-
 }

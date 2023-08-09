@@ -87,7 +87,7 @@ public class EpicHandler implements HttpHandler {
     }
 
     private Epic getCreatedEpic() {
-        OptionalInt newEpicId = taskManager.getAllEpics().stream()
+        OptionalInt newEpicId = taskManager.getEpics().stream()
                 .map(Task::getId)
                 .mapToInt(id -> id)
                 .max();
@@ -99,8 +99,8 @@ public class EpicHandler implements HttpHandler {
             return new Response(400, "Тело запроса не должно быть пустым.");
         } else {
             Epic epicData = gson.fromJson(requestBody, Epic.class);
-            taskManager.createTask(epicData);
-            Task createdEpic = getCreatedEpic();
+            taskManager.createEpic(epicData);
+            Epic createdEpic = getCreatedEpic();
             return new Response(201, gson.toJson(createdEpic));
         }
     }
@@ -109,7 +109,7 @@ public class EpicHandler implements HttpHandler {
         try {
             Epic epic  = gson.fromJson(requestBody, Epic.class);
             int epicId = epic.getId();
-            taskManager.updateTask(epicId, epic);
+            taskManager.updateEpic(epicId, epic);
 
             return new Response(200, gson.toJson(taskManager.getEpic(epicId)));
         } catch (ManagerValidateException e) {
@@ -140,6 +140,6 @@ public class EpicHandler implements HttpHandler {
 
     private Response deleteAllEpics() {
         taskManager.removeAllEpics();
-        return new Response(200, "Все задачи удалены.");
+        return new Response(200, "Все эпики удалены.");
     }
 }

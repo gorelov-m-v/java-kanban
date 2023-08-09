@@ -84,7 +84,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private void save() {
         try (FileWriter fileWriter = new FileWriter(file)) {
-            String str = Stream.of(getAllEpics(), getAllSubtasks(), getAllTasks())
+            String str = Stream.of(getEpics(), getAllSubtasks(), getAllTasks())
                     .flatMap(List::stream)
                     .sorted(Comparator.comparingInt(Task::getId))
                     .map(this::taskToSCV)

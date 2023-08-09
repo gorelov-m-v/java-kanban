@@ -40,4 +40,5 @@ public interface TaskManager {
     Task getTask(int i);
     Epic getEpic(int i);
     Subtask getSubtask(int i);
+    List<Epic> getEpics();
 }

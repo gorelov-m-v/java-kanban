@@ -82,6 +82,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
+    public List<Epic> getEpics() {
+        return new ArrayList<>(epics.values());
+    }
+
+    @Override
     public Subtask getSubtaskById(int id) {
         Subtask subtask = subtasks.get(id);
         Optional<Task> optionalTask = Optional.ofNullable(subtasks.get(id));
@@ -93,11 +98,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Integer> getAllSubtasksFromEpic(int epicId) {
-        return epics.values().stream()
-                .filter(epic -> epic.getId() == epicId)
-                .map(Epic::getSubtasks)
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
+
+        return getEpic(epicId).getSubtasks();
     }
 
     @Override
@@ -113,8 +115,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createEpic(Epic epic) {
         epic.setId(getNewId());
+        epic.setStatus(NEW);
         epics.put(epic.getId(), epic);
-        checkEpicStatus(epic);
+//        checkEpicStatus(epic);
     }
 
     @Override
@@ -164,6 +167,7 @@ public class InMemoryTaskManager implements TaskManager {
             throw new ManagerValidateException(String.format("Эпика с id = %d, не существует", epicId));
         }
         newEpic.setId(epicId);
+        newEpic.setStatus(getEpic(epicId).getStatus());
         epics.put(epicId, newEpic);
     }
 
@@ -202,8 +206,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeEpicById(int id) {
-        getAllSubtasksFromEpic(id)
-                .forEach(subtaskId -> historyManager.removeById(subtaskId));
+        if (getAllSubtasksFromEpic(id) != null) {
+            getAllSubtasksFromEpic(id)
+                    .forEach(subtaskId -> historyManager.removeById(subtaskId));
+        }
 
         historyManager.removeById(id);
 
@@ -388,4 +394,6 @@ public class InMemoryTaskManager implements TaskManager {
     public Subtask getSubtask(int id) {
         return subtasks.get(id);
     }
+
+
 }
