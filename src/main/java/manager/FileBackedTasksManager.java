@@ -28,6 +28,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         this.file = file;
     }
 
+    public FileBackedTasksManager(String url) {
+
+    }
+
     private String taskToSCV(Task task) {
         String[] arr = new String[]{
                 String.valueOf(task.getId()),
@@ -82,7 +86,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    private void save() {
+    public void save() {
         try (FileWriter fileWriter = new FileWriter(file)) {
             String str = Stream.of(getEpics(), getAllSubtasks(), getAllTasks())
                     .flatMap(List::stream)

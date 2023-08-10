@@ -13,7 +13,12 @@ import org.apache.http.client.utils.URIBuilder;
 public class KVTaskClient {
 
     private String API_TOKEN;
-    private String url = "localhost:8079";
+    private final String url;
+
+    public KVTaskClient(String url) {
+        this.url = url;
+        register();
+    }
 
     private void register() {
         try {
