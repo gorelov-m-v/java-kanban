@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +26,9 @@ public class KVServer {
         server.createContext("/register", this::register);
         server.createContext("/save", this::save);
         server.createContext("/load", this::load);
+
+        System.out.println("KV-сервер запущен на " + PORT + " порту!");
+        System.out.println(apiToken);
     }
 
     private void load(HttpExchange h) throws IOException {
@@ -112,6 +116,7 @@ public class KVServer {
         System.out.println("Открой в браузере http://localhost:" + PORT + "/");
         System.out.println("API_TOKEN: " + apiToken);
         server.start();
+
     }
 
     private String generateApiToken() {

@@ -20,7 +20,7 @@ public class KVTaskClient {
         register();
     }
 
-    private void register() {
+    public void register() {
         try {
             URI uri = new URIBuilder(url + "/register")
                     .build();
@@ -67,7 +67,7 @@ public class KVTaskClient {
     public String load(String key) {
         String value;
         try {
-            URI uri = new URIBuilder(url + "/save/" + key)
+            URI uri = new URIBuilder(url + "/load/" + key)
                     .addParameter("API_TOKEN", API_TOKEN)
                     .build();
 

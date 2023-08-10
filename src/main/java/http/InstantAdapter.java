@@ -4,7 +4,6 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-
 import java.io.IOException;
 import java.time.Instant;
 
@@ -14,7 +13,7 @@ public class InstantAdapter extends TypeAdapter<Instant> {
         if (instant == null) {
             jsonWriter.nullValue();
         } else {
-            jsonWriter.value(instant.toString());
+            jsonWriter.value(instant.toEpochMilli());
         }
     }
 
@@ -24,7 +23,8 @@ public class InstantAdapter extends TypeAdapter<Instant> {
             jsonReader.nextNull();
             return null;
         } else {
-            return Instant.ofEpochSecond(jsonReader.nextInt());
+            long ts = jsonReader.nextLong();
+            return Instant.ofEpochMilli(ts);
         }
     }
 }

@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import http.HttpTaskServer;
 import http.KVServer;
 import manager.InMemoryTaskManager;
 import model.Epic;
@@ -21,16 +22,10 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        // Сгенерировал строку
-        List<Integer> history = List.of(1, 2, 3, 4, 5, 6, 7);
-        Gson gson = new Gson();
-        String value1 = gson.toJson(history);
-
-        // Вот этот метод
-        List<Integer> history1 = gson.fromJson(value1, new TypeToken<>(){});
 
 
-        // Вывод
-        System.out.println(history1);
+        KVServer kvServer = new KVServer();
+        kvServer.start();
+        HttpTaskServer httpTaskServer = new HttpTaskServer();
     }
 }

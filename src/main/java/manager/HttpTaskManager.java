@@ -13,6 +13,8 @@ import com.google.gson.JsonParser;
 import java.time.Instant;
 import java.util.List;
 
+import static model.constant.Keys.*;
+
 public class HttpTaskManager extends FileBackedTasksManager {
 
     private final KVTaskClient kvTaskClient;
@@ -29,7 +31,7 @@ public class HttpTaskManager extends FileBackedTasksManager {
 
     @Override
     public void save() {
-        kvTaskClient.save(Keys.TASKS.getKey(), gson.toJson(tasks.values()));
+        kvTaskClient.save(TASKS.getKey(), gson.toJson(tasks.values()));
         kvTaskClient.save(Keys.SUBTASKS.getKey(), gson.toJson(subtasks.values()));
         kvTaskClient.save(Keys.EPICS.getKey(), gson.toJson(epics.values()));
         kvTaskClient.save(Keys.HISTORY.getKey(), gson.toJson(historyManager.getHistory()));
@@ -59,17 +61,21 @@ public class HttpTaskManager extends FileBackedTasksManager {
                     prioritizedTasks.add(subtask);
                     break;
                 case HISTORY:
-                    List<Integer> history = gson.fromJson(value, new TypeToken<>() {});
-                    history.forEach(i ->
-                    {
-                        if (epics.containsValue(i)) {
-                            historyManager.add(epics.get(i));
-                        } else if (tasks.containsValue(i)) {
-                            historyManager.add(tasks.get(i));
-                        } else {
-                            historyManager.add(subtasks.get(i));
-                        }
+                    List<Integer> history = gson.fromJson(value, new TypeToken<>() {
                     });
+                    if (!history.isEmpty()) {
+                        history.forEach(i ->
+                        {
+                            if (epics.containsValue(i)) {
+                                historyManager.add(epics.get(i));
+                            } else if (tasks.containsValue(i)) {
+                                historyManager.add(tasks.get(i));
+                            } else {
+                                historyManager.add(subtasks.get(i));
+                            }
+                        });
+                    }
+
             }
         }
     }

@@ -2,6 +2,7 @@ package http;
 
 import com.sun.net.httpserver.HttpServer;
 import manager.FileBackedTasksManager;
+import manager.Managers;
 import manager.TaskManager;
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +19,8 @@ public class HttpTaskServer {
                     "resources" + File.separator +
                     "test.csv");
     private File file = new File(String.valueOf(PATH));
-    TaskManager taskManager = new FileBackedTasksManager(file);
+//    TaskManager taskManager = new FileBackedTasksManager(file);
+    TaskManager taskManager = Managers.getDefaultTaskManager();
 
 
     public static void main(String[] args) throws IOException {
@@ -33,7 +35,6 @@ public class HttpTaskServer {
         httpServer.createContext("/tasks/subtask", new SubtaskHandler(taskManager));
         httpServer.createContext("/tasks/epic", new EpicHandler(taskManager));
         httpServer.start();
-
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
     }
 
