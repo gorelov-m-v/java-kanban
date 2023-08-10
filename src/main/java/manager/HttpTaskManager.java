@@ -9,9 +9,10 @@ import model.Subtask;
 import model.Task;
 import model.constant.Keys;
 import com.google.gson.JsonParser;
-
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static model.constant.Keys.*;
 
@@ -34,7 +35,10 @@ public class HttpTaskManager extends FileBackedTasksManager {
         kvTaskClient.save(TASKS.getKey(), gson.toJson(tasks.values()));
         kvTaskClient.save(Keys.SUBTASKS.getKey(), gson.toJson(subtasks.values()));
         kvTaskClient.save(Keys.EPICS.getKey(), gson.toJson(epics.values()));
-        kvTaskClient.save(Keys.HISTORY.getKey(), gson.toJson(historyManager.getHistory()));
+        List<Integer> history = historyManager.getHistory().stream()
+                .map(Task::getId)
+                .collect(Collectors.toList());
+        kvTaskClient.save(Keys.HISTORY.getKey(), gson.toJson(history));
     }
 
     public void loadByKey(Keys key) {
@@ -66,18 +70,16 @@ public class HttpTaskManager extends FileBackedTasksManager {
                     if (!history.isEmpty()) {
                         history.forEach(i ->
                         {
-                            if (epics.containsValue(i)) {
+                            if (epics.containsKey(i)) {
                                 historyManager.add(epics.get(i));
-                            } else if (tasks.containsValue(i)) {
+                            } else if (tasks.containsKey(i)) {
                                 historyManager.add(tasks.get(i));
                             } else {
                                 historyManager.add(subtasks.get(i));
                             }
                         });
                     }
-
             }
         }
     }
-
 }
