@@ -41,11 +41,10 @@ public class TaskHandler implements HttpHandler {
 
         switch (method) {
             case "POST":
-                if (isUpdate(requestBody)) {
-                    response = updateTask(requestBody);
-                } else {
-                    response = createTask(requestBody);
-                }
+                response = createTask(requestBody);
+                break;
+            case "PUT":
+                response = updateTask(requestBody);
                 break;
             case "GET":
                 response = getTask(getIdFromPath(exchange));
@@ -58,7 +57,7 @@ public class TaskHandler implements HttpHandler {
                 }
                 break;
             default:
-                response = new Response(405, "Метод не поддерживается. Доступны: GET, POST, DELETE");
+                response = new Response(405, "Метод не поддерживается. Доступны: GET, POST, DELETE, PUT");
         }
 
         Headers headers2 = exchange.getResponseHeaders();

@@ -1,3 +1,5 @@
 id,type,name,status,description,epicId
-1,TASK,Montana B2C Chief empower,NEW,syndicate digital mobile,,1970-01-20T13:54:42.828Z,40
+1,EPIC,TestTaskTitle,NEW,TestTaskDescription,,2023-08-10T21:00:25.512994900Z,30,
+2,SUBTASK,TestSubtaskTitle,NEW,TestSubtaskDescription,1,2023-08-10T21:00:25.512994900Z,30
 
+1
