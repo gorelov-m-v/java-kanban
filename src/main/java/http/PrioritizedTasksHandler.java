@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 
 public class PrioritizedTasksHandler implements HttpHandler {
@@ -24,6 +25,7 @@ public class PrioritizedTasksHandler implements HttpHandler {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setPrettyPrinting();
         gsonBuilder.serializeNulls();
+        gsonBuilder.registerTypeAdapter(Instant.class, new InstantAdapter());
         this.gson = gsonBuilder.create();
     }
 
@@ -34,7 +36,7 @@ public class PrioritizedTasksHandler implements HttpHandler {
         final String path = exchange.getRequestURI().getPath();
         final String response;
 
-        if (method.equals("GET")) {
+        if (method.equals("GET") && exchange.getRequestURI().getPath().equals("/tasks/")) {
             code = 200;
             List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
             response = gson.toJson(prioritizedTasks);
@@ -44,7 +46,7 @@ public class PrioritizedTasksHandler implements HttpHandler {
         }
 
         Headers headers = exchange.getResponseHeaders();
-        headers.set("Content-Type", "text/plain");
+        headers.set("Content-Type", "application/json");
 
         exchange.sendResponseHeaders(code, 0);
         if (response != null) {

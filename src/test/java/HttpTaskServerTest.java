@@ -9,6 +9,7 @@ import http.epic.get.GetEpicResponse;
 import http.epic.update.UpdateEpicDataSet;
 import http.epic.update.UpdateEpicRequest;
 import http.epic.update.UpdateEpicResponse;
+import http.history.GetHistoryRequest;
 import http.subtask.create.CreateSubtaskDataSet;
 import http.subtask.create.CreateSubtaskRequest;
 import http.subtask.create.CreateSubtaskResponse;
@@ -27,6 +28,7 @@ import http.task.deleteall.DeleteAllTasksRequest;
 import http.task.delete.DeleteTaskRequest;
 import http.task.get.GetTaskRequest;
 import http.task.get.GetTaskResponse;
+import http.task.prioritized.GetPrioritizedTasksRequest;
 import http.task.update.UpdateTaskDataSet;
 import http.task.update.UpdateTaskRequest;
 import http.task.update.UpdateTaskResponse;
@@ -55,9 +57,8 @@ public class HttpTaskServerTest {
     DeleteAllSubtaskRequest deleteAllSubtaskRequest = new DeleteAllSubtaskRequest();
     UpdateSubtaskRequest updateSubtaskRequest = new UpdateSubtaskRequest();
     GetEpicSubtasksRequest getEpicSubtasksRequest = new GetEpicSubtasksRequest();
-
-    // Шеф, прости пожалуйста. Я мучался с этим http-клиентом. В тестировании REST API никто с ним не работает
-    // Поэтому я взял то, с чем работают.
+    GetHistoryRequest getHistoryRequest = new GetHistoryRequest();
+    GetPrioritizedTasksRequest getPrioritizedTasksRequest = new GetPrioritizedTasksRequest();
 
     @BeforeEach
     public void startServer() {
@@ -203,7 +204,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void getEpicTestPositive() {
+    public void getEpicTestNegative() {
         CreateEpicDataSet epic = new CreateEpicDataSet("EXE1", "payment1");
 
         createEpicRequest.createEpic(epic);
@@ -214,13 +215,14 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void getEpicTestNegative() {
+    public void getEpicTestPositive() {
         CreateEpicDataSet epic = new CreateEpicDataSet("EXE1", "payment1");
 
         createEpicRequest.createEpic(epic);
 
-        GetEpicResponse getEpicResponse = getEpicRequest.getEpicByIdPositive(2);
+        GetEpicResponse getEpicResponse = getEpicRequest.getEpicByIdPositive(1);
 
+        assertThat(getEpicResponse.getSubtasks()).isEqualTo(List.of());
         assertThat(getEpicResponse.getId()).isEqualTo(1);
         assertThat(getEpicResponse.getTitle()).isEqualTo(epic.getTitle());
         assertThat(getEpicResponse.getDescription()).isEqualTo(epic.getDescription());
@@ -441,6 +443,36 @@ public class HttpTaskServerTest {
         assertThat(response.get(0)).isEqualTo(getSubtaskRequest.getSubtaskByIdPositive(2));
     }
 
+    @Test
+    public void GetHistoryTest() {
+        CreateTaskDataSet task = new CreateTaskDataSet("EXE1", "payment1",
+                "1691684240", 40);
+
+        createTaskRequest.createTask(task);
+
+        GetTaskResponse getTaskResponse = getTaskRequest.getTaskByIdPositive(1);
+        List<GetTaskResponse> history = getHistoryRequest.getHistoryRequest();
+
+        assertThat(history).isEqualTo(List.of(getTaskResponse));
+    }
+
+    @Test
+    public void GetPrioritizedTasksTest() {
+        CreateTaskDataSet task1 = new CreateTaskDataSet("EXE1", "payment1",
+                "1691684240", 40);
+        CreateTaskDataSet task2 = new CreateTaskDataSet("EXE1", "payment1",
+                "1681684240", 40);
+
+        createTaskRequest.createTask(task1);
+        createTaskRequest.createTask(task2);
+
+        GetTaskResponse getTask1Response = getTaskRequest.getTaskByIdPositive(1);
+        GetTaskResponse getTask2Response = getTaskRequest.getTaskByIdPositive(2);
+
+        List<GetTaskResponse> prioritizedTasks = getPrioritizedTasksRequest.getPrioritizedTasks();
+        System.out.println(prioritizedTasks);
+        assertThat(prioritizedTasks).isEqualTo(List.of(getTask2Response, getTask1Response));
+    }
     @AfterEach
     public void stopServer() {
         kvServer.stop();

@@ -1,5 +1,7 @@
 package http.task.get;
 
+import java.util.Objects;
+
 public class GetTaskResponse {
     private int id;
     private String title;
@@ -76,5 +78,33 @@ public class GetTaskResponse {
                 ", duration=" + duration +
                 ", endTime=" + endTime +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GetTaskResponse that = (GetTaskResponse) o;
+
+        if (id != that.id) return false;
+        if (startTime != that.startTime) return false;
+        if (duration != that.duration) return false;
+        if (endTime != that.endTime) return false;
+        if (!Objects.equals(title, that.title)) return false;
+        if (!Objects.equals(description, that.description)) return false;
+        return Objects.equals(status, that.status);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (int) (startTime ^ (startTime >>> 32));
+        result = 31 * result + (int) (duration ^ (duration >>> 32));
+        result = 31 * result + (int) (endTime ^ (endTime >>> 32));
+        return result;
     }
 }
