@@ -17,8 +17,6 @@ public class HttpTaskServer {
                     "main" + File.separator +
                     "resources" + File.separator +
                     "test.csv");
-    private File file = new File(String.valueOf(PATH));
-//    TaskManager taskManager = new FileBackedTasksManager(file);
     TaskManager taskManager = Managers.getDefaultTaskManager();
 
 

@@ -47,14 +47,13 @@ public class SubtaskHandler implements HttpHandler {
 
         switch (method) {
             case "POST":
-                if (isUpdate(requestBody)) {
-                    response = updateSubtask(requestBody);
-                } else {
-                    response = createSubtask(exchange, requestBody);
-                }
+                response = createSubtask(exchange, requestBody);
+                break;
+            case "PUT":
+                response = updateSubtask(requestBody);
                 break;
             case "GET":
-                if (isEpicSubtask(exchange)) {
+                if (exchange.getRequestURI().getPath().equals("/tasks/subtask/epic/")) {
                     response = getEpicSubtasks(exchange);
                 } else {
                     response = getSubtask(getIdFromPath(exchange));

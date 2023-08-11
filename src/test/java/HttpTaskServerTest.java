@@ -9,6 +9,17 @@ import http.epic.get.GetEpicResponse;
 import http.epic.update.UpdateEpicDataSet;
 import http.epic.update.UpdateEpicRequest;
 import http.epic.update.UpdateEpicResponse;
+import http.subtask.create.CreateSubtaskDataSet;
+import http.subtask.create.CreateSubtaskRequest;
+import http.subtask.create.CreateSubtaskResponse;
+import http.subtask.delete.DeleteSubtaskRequest;
+import http.subtask.deleteall.DeleteAllSubtaskRequest;
+import http.subtask.gelepicsubtask.GetEpicSubtasksRequest;
+import http.subtask.get.GetSubtaskRequest;
+import http.subtask.get.GetSubtaskResponse;
+import http.subtask.update.UpdateSubtaskDataSet;
+import http.subtask.update.UpdateSubtaskRequest;
+import http.subtask.update.UpdateSubtaskResponse;
 import http.task.create.CreateTaskDataSet;
 import http.task.create.CreateTaskRequest;
 import http.task.create.CreateTaskResponse;
@@ -21,6 +32,8 @@ import http.task.update.UpdateTaskRequest;
 import http.task.update.UpdateTaskResponse;
 import org.junit.jupiter.api.*;
 import java.io.IOException;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 
 public class HttpTaskServerTest {
@@ -36,6 +49,12 @@ public class HttpTaskServerTest {
     DeleteEpicRequest deleteEpicRequest = new DeleteEpicRequest();
     DeleteAllEpicRequest deleteAllEpicRequest = new DeleteAllEpicRequest();
     UpdateEpicRequest updateEpicRequest = new UpdateEpicRequest();
+    CreateSubtaskRequest createSubtaskRequest = new CreateSubtaskRequest();
+    GetSubtaskRequest getSubtaskRequest = new GetSubtaskRequest();
+    DeleteSubtaskRequest deleteSubtaskRequest = new DeleteSubtaskRequest();
+    DeleteAllSubtaskRequest deleteAllSubtaskRequest = new DeleteAllSubtaskRequest();
+    UpdateSubtaskRequest updateSubtaskRequest = new UpdateSubtaskRequest();
+    GetEpicSubtasksRequest getEpicSubtasksRequest = new GetEpicSubtasksRequest();
 
     // Шеф, прости пожалуйста. Я мучался с этим http-клиентом. В тестировании REST API никто с ним не работает
     // Поэтому я взял то, с чем работают.
@@ -270,6 +289,156 @@ public class HttpTaskServerTest {
         int statusCode =  updateEpicRequest.updateEpicNegative(updateEpicDataSet);
 
         assertThat(statusCode).isEqualTo(404);
+    }
+
+    @Test
+    public void createSubtaskTest() {
+        CreateEpicDataSet epic = new CreateEpicDataSet("EXE1", "payment1");
+        CreateSubtaskDataSet subtask = new CreateSubtaskDataSet("EXE1", "payment1",
+                "1691684240", 40);
+
+        createEpicRequest.createEpic(epic);
+
+        CreateSubtaskResponse response = createSubtaskRequest.createSubtask(subtask, 1);
+
+        assertThat(response.getEpicId()).isEqualTo(1);
+        assertThat(response.getId()).isEqualTo(2);
+        assertThat(response.getTitle()).isEqualTo(subtask.getTitle());
+        assertThat(response.getDescription()).isEqualTo(subtask.getDescription());
+        assertThat(response.getStartTime()).isEqualTo(Integer.parseInt(subtask.getStartTime()));
+        assertThat(response.getDuration()).isEqualTo(subtask.getDuration());
+        assertThat(response.getEndTime()).isEqualTo(
+                Integer.parseInt(subtask.getStartTime()) + subtask.getDuration() * 60 * 1000);
+    }
+
+    @Test
+    public void getSubtaskTestPositive() {
+        CreateEpicDataSet epic = new CreateEpicDataSet("EXE1", "payment1");
+        CreateSubtaskDataSet subtask = new CreateSubtaskDataSet("EXE1", "payment1",
+                "1691684240", 40);
+
+        createEpicRequest.createEpic(epic);
+        createSubtaskRequest.createSubtask(subtask, 1);
+
+        GetSubtaskResponse getSubtaskResponse = getSubtaskRequest.getSubtaskByIdPositive(2);
+
+        assertThat(getSubtaskResponse.getEpicId()).isEqualTo(1);
+        assertThat(getSubtaskResponse.getId()).isEqualTo(2);
+        assertThat(getSubtaskResponse.getTitle()).isEqualTo(subtask.getTitle());
+        assertThat(getSubtaskResponse.getDescription()).isEqualTo(subtask.getDescription());
+        assertThat(getSubtaskResponse.getStartTime()).isEqualTo(Integer.parseInt(subtask.getStartTime()));
+        assertThat(getSubtaskResponse.getDuration()).isEqualTo(subtask.getDuration());
+        assertThat(getSubtaskResponse.getEndTime()).isEqualTo(
+                Integer.parseInt(subtask.getStartTime()) + subtask.getDuration() * 60 * 1000);
+    }
+
+    @Test
+    public void getSubtaskTestNegative() {
+        CreateEpicDataSet epic = new CreateEpicDataSet("EXE1", "payment1");
+        CreateSubtaskDataSet subtask = new CreateSubtaskDataSet("EXE1", "payment1",
+                "1691684240", 40);
+
+        createEpicRequest.createEpic(epic);
+        createSubtaskRequest.createSubtask(subtask, 1);
+
+        int statusCode = getSubtaskRequest.getSubtaskByIdNegative(3);
+
+        assertThat(statusCode).isEqualTo(404);
+    }
+
+    @Test
+    public void deleteSubtaskTestPositive() {
+        CreateEpicDataSet epic = new CreateEpicDataSet("EXE1", "payment1");
+        CreateSubtaskDataSet subtask = new CreateSubtaskDataSet("EXE1", "payment1",
+                "1691684240", 40);
+
+        createEpicRequest.createEpic(epic);
+        createSubtaskRequest.createSubtask(subtask, 1);
+
+        int deleteStatusCode = deleteSubtaskRequest.deleteSubtaskById(2);
+
+        assertThat(deleteStatusCode).isEqualTo(200);
+    }
+
+    @Test
+    public void deleteSubtaskTestNegative() {
+        CreateEpicDataSet epic = new CreateEpicDataSet("EXE1", "payment1");
+        CreateSubtaskDataSet subtask = new CreateSubtaskDataSet("EXE1", "payment1",
+                "1691684240", 40);
+
+        createEpicRequest.createEpic(epic);
+        createSubtaskRequest.createSubtask(subtask, 1);
+
+        int deleteStatusCode = deleteSubtaskRequest.deleteSubtaskById(3);
+
+        assertThat(deleteStatusCode).isEqualTo(404);
+    }
+
+    @Test
+    public void deleteAllSubtasks() {
+        CreateEpicDataSet epic = new CreateEpicDataSet("EXE1", "payment1");
+        CreateSubtaskDataSet subtask = new CreateSubtaskDataSet("EXE1", "payment1",
+                "1691684240", 40);
+
+        createEpicRequest.createEpic(epic);
+        createSubtaskRequest.createSubtask(subtask, 1);
+
+        int deleteStatusCode = deleteAllSubtaskRequest.deleteAllSubtasks();
+
+        assertThat(deleteStatusCode).isEqualTo(200);
+    }
+
+    @Test
+    public void updateSubtaskTestPositive() {
+        CreateEpicDataSet epic = new CreateEpicDataSet("EXE1", "payment1");
+        CreateSubtaskDataSet subtask = new CreateSubtaskDataSet("EXE1", "payment1",
+                "1691684240", 40);
+        UpdateSubtaskDataSet updateSubtask = new UpdateSubtaskDataSet(2, "DONE", "EXE1",
+                "payment1", "1691684240", 40);
+
+        createEpicRequest.createEpic(epic);
+        createSubtaskRequest.createSubtask(subtask, 1);
+
+        UpdateSubtaskResponse updateSubtaskResponse = updateSubtaskRequest.updateSubtaskPositive(updateSubtask);
+
+        assertThat(updateSubtaskResponse.getEpicId()).isEqualTo(1);
+        assertThat(updateSubtaskResponse.getId()).isEqualTo(2);
+        assertThat(updateSubtaskResponse.getTitle()).isEqualTo(updateSubtask.getTitle());
+        assertThat(updateSubtaskResponse.getDescription()).isEqualTo(updateSubtask.getDescription());
+        assertThat(updateSubtaskResponse.getStartTime()).isEqualTo(Integer.parseInt(updateSubtask.getStartTime()));
+        assertThat(updateSubtaskResponse.getDuration()).isEqualTo(updateSubtask.getDuration());
+        assertThat(updateSubtaskResponse.getEndTime()).isEqualTo(
+                Integer.parseInt(updateSubtask.getStartTime()) + updateSubtask.getDuration() * 60 * 1000);
+    }
+
+    @Test
+    public void updateSubtaskTestNegative() {
+        CreateEpicDataSet epic = new CreateEpicDataSet("EXE1", "payment1");
+        CreateSubtaskDataSet subtask = new CreateSubtaskDataSet("EXE1", "payment1",
+                "1691684240", 40);
+        UpdateSubtaskDataSet updateSubtask = new UpdateSubtaskDataSet(7, "DONE", "EXE1",
+                "payment1", "1691684240", 40);
+
+        createEpicRequest.createEpic(epic);
+        createSubtaskRequest.createSubtask(subtask, 1);
+
+        int statusCode = updateSubtaskRequest.updateSubtaskNegative(updateSubtask);
+
+        assertThat(statusCode).isEqualTo(400);
+    }
+
+    @Test
+    public void getEpicSubtasks() {
+        CreateEpicDataSet epic = new CreateEpicDataSet("EXE1", "payment1");
+        CreateSubtaskDataSet subtask = new CreateSubtaskDataSet("EXE1", "payment1",
+                "1691684240", 40);
+
+        createEpicRequest.createEpic(epic);
+        createSubtaskRequest.createSubtask(subtask, 1);
+
+        List<GetSubtaskResponse> response = getEpicSubtasksRequest.getEpicSubtasksRequestPositive(1);
+
+        assertThat(response.get(0)).isEqualTo(getSubtaskRequest.getSubtaskByIdPositive(2));
     }
 
     @AfterEach
