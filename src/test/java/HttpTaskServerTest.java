@@ -184,12 +184,23 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void getEpicTest() {
+    public void getEpicTestPositive() {
         CreateEpicDataSet epic = new CreateEpicDataSet("EXE1", "payment1");
 
         createEpicRequest.createEpic(epic);
 
-        GetEpicResponse getEpicResponse = getEpicRequest.getEpicByIdPositive(1);
+        int statusCode = getEpicRequest.getEpicByIdNegative(2);
+
+        assertThat(statusCode).isEqualTo(404);
+    }
+
+    @Test
+    public void getEpicTestNegative() {
+        CreateEpicDataSet epic = new CreateEpicDataSet("EXE1", "payment1");
+
+        createEpicRequest.createEpic(epic);
+
+        GetEpicResponse getEpicResponse = getEpicRequest.getEpicByIdPositive(2);
 
         assertThat(getEpicResponse.getId()).isEqualTo(1);
         assertThat(getEpicResponse.getTitle()).isEqualTo(epic.getTitle());
