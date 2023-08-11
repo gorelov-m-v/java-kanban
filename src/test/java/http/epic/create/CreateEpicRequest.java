@@ -5,13 +5,13 @@ import static io.restassured.RestAssured.given;
 
 public class CreateEpicRequest {
 
-    public CreateEpicResponse createTask(CreateEpicDataSet createTaskDataSet) {
+    public CreateEpicResponse createEpic(CreateEpicDataSet createEpicDataSet) {
         RestAssured.baseURI = "http://localhost";
         return given()
                 .port(8080)
                 .header("Content-type", "application/json")
                 .and()
-                .body(createTaskDataSet)
+                .body(createEpicDataSet)
                 .when()
                 .post("/tasks/epic/")
                 .then()

@@ -42,11 +42,10 @@ public class EpicHandler implements HttpHandler {
 
         switch (method) {
             case "POST":
-                if (isUpdate(requestBody)) {
-                    response = updateEpic(requestBody);
-                } else {
-                    response = createEpic(requestBody);
-                }
+                response = createEpic(requestBody);
+                break;
+            case "PUT":
+                response = updateEpic(requestBody);
                 break;
             case "GET":
                 response = getEpic(getIdFromPath(exchange));
@@ -59,7 +58,7 @@ public class EpicHandler implements HttpHandler {
                 }
                 break;
             default:
-                response = new Response(405, "Метод не поддерживается. Доступны: GET, POST, DELETE");
+                response = new Response(405, "Метод не поддерживается. Доступны: GET, POST, DELETE, PUT");
         }
 
         Headers headers2 = exchange.getResponseHeaders();
