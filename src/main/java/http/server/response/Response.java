@@ -1,4 +1,4 @@
-package http;
+package http.server.response;
 
 public class Response {
     private int code;

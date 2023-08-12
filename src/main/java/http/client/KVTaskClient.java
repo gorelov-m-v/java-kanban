@@ -1,4 +1,4 @@
-package http;
+package http.client;
 
 import com.google.gson.JsonParser;
 import org.apache.http.client.utils.URIBuilder;

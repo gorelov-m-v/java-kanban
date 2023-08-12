@@ -1,6 +1,9 @@
 package http.epic.create;
 
+import java.util.List;
+
 public class CreateEpicResponse {
+    private List<Integer> subtasks;
     private int id;
     private String title;
     private String description;
@@ -8,6 +11,15 @@ public class CreateEpicResponse {
     private long startTime;
     private long duration;
     private long endTime;
+
+
+    public List<Integer> getSubtasks() {
+        return subtasks;
+    }
+
+    public void setSubtasks(List<Integer> subtasks) {
+        this.subtasks = subtasks;
+    }
 
     public int getId() {
         return id;
@@ -67,8 +79,9 @@ public class CreateEpicResponse {
 
     @Override
     public String toString() {
-        return "CreateTaskResponse{" +
-                "id=" + id +
+        return "CreateEpicResponse{" +
+                "subtasks=" + subtasks +
+                ", id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", status='" + status + '\'' +

@@ -2,15 +2,14 @@ package manager;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import http.InstantAdapter;
-import http.KVTaskClient;
+import http.server.adapter.InstantAdapter;
+import http.client.KVTaskClient;
 import model.Epic;
 import model.Subtask;
 import model.Task;
 import model.constant.Keys;
 import com.google.gson.JsonParser;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 

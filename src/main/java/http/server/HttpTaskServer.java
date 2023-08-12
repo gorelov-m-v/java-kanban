@@ -1,6 +1,7 @@
-package http;
+package http.server;
 
 import com.sun.net.httpserver.HttpServer;
+import http.server.handler.*;
 import manager.Managers;
 import manager.TaskManager;
 import java.io.File;

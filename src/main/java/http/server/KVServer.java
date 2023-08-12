@@ -1,4 +1,4 @@
-package http;
+package http.server;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

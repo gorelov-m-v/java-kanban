@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Creating Task request schema",
+  "description": "A product from the catalog",
+  "type": "object",
+  "properties": {
+    "title": {
+      "description": "Название задачи.",
+      "type": "string"
+    },
+    "description": {
+      "description": "Описание задачи.",
+      "type": "string"
+    },
+    "startTime": {
+      "description": "Дата начала работы над задачей, timestamp.",
+      "type": "string"
+    },
+    "duration": {
+      "description": "Продолжительность работы над задачей, в минутах.",
+      "type": "integer",
+      "minimum": 0,
+      "exclusiveMinimum": true
+    }
+  },
+  "required": ["title", "description", "startTime", "duration"]
+}

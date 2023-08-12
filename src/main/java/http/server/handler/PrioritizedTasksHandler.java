@@ -1,17 +1,16 @@
-package http;
+package http.server.handler;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import http.server.adapter.InstantAdapter;
 import manager.TaskManager;
 import model.Task;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 

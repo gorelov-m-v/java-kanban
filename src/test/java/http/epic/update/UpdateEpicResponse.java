@@ -1,6 +1,9 @@
 package http.epic.update;
 
+import java.util.List;
+
 public class UpdateEpicResponse {
+    private List<Integer> subtasks;
     private int id;
     private String title;
     private String description;
@@ -8,6 +11,14 @@ public class UpdateEpicResponse {
     private long startTime;
     private long duration;
     private long endTime;
+
+    public List<Integer> getSubtasks() {
+        return subtasks;
+    }
+
+    public void setSubtasks(List<Integer> subtasks) {
+        this.subtasks = subtasks;
+    }
 
     public int getId() {
         return id;

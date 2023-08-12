@@ -1,10 +1,14 @@
-package http;
+package http.server.handler;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import http.server.response.Errors;
+import http.server.adapter.InstantAdapter;
+import http.server.response.PlatformError;
+import http.server.response.Response;
 import manager.TaskManager;
 import model.Task;
 import model.exception.ManagerIntersectionException;
@@ -15,10 +19,12 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.List;
 import java.util.OptionalInt;
 
-public class TaskHandler implements HttpHandler {
+public class TaskHandler extends HandlerHelper implements HttpHandler {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+    private static final String SCHEMA = "/create_task_schema.json";
     private final TaskManager taskManager;
     private final Gson gson;
 
@@ -41,7 +47,11 @@ public class TaskHandler implements HttpHandler {
 
         switch (method) {
             case "POST":
-                response = createTask(requestBody);
+                if (validateJson(requestBody, SCHEMA)) {
+                    response = createTask(requestBody);
+                } else {
+                    response = new Response(400, getJsonError(requestBody, SCHEMA));
+                }
                 break;
             case "PUT":
                 response = updateTask(requestBody);
@@ -57,7 +67,8 @@ public class TaskHandler implements HttpHandler {
                 }
                 break;
             default:
-                response = new Response(405, "Метод не поддерживается. Доступны: GET, POST, DELETE, PUT");
+                response = new Response(405,  gson.toJson(
+                        constructError(405,"Метод не поддерживается. Доступны: GET, POST, DELETE, PUT")));
         }
 
         Headers headers2 = exchange.getResponseHeaders();
@@ -79,30 +90,16 @@ public class TaskHandler implements HttpHandler {
         return taskManager.getTask(newTaskId.getAsInt());
     }
 
-    private int getIdFromPath(HttpExchange exchange) {
-        return Integer.parseInt(exchange.getRequestURI().getQuery().split("=")[1]);
-    }
+    public Response createTask(String body) {
 
-    private boolean isUpdate(String requestBody) {
-        return requestBody.contains("\"id\": ");
-    }
-
-    private boolean isTotalDelete(HttpExchange exchange) {
-        return exchange.getRequestURI().getQuery() == null;
-    }
-
-    private Response createTask(String body) {
-        if (body.isEmpty()) {
-            return new Response(400, "Тело запроса не должно быть пустым.");
-        } else {
-            try {
-                Task taskData = gson.fromJson(body, Task.class);
-                taskManager.createTask(taskData);
-                Task createdTask = getCreatedTask();
-                return new Response(201, gson.toJson(createdTask));
-            } catch (ManagerIntersectionException e) {
-                return new Response(400, e.getMessage());
-            }
+        try {
+            Task taskData = gson.fromJson(body, Task.class);
+            taskManager.createTask(taskData);
+            Task createdTask = getCreatedTask();
+            return new Response(201, gson.toJson(createdTask));
+        } catch (ManagerIntersectionException e) {
+            return new Response(400, gson.toJson(new Errors(
+                    false, 400, List.of(new PlatformError(e.getMessage())))));
         }
     }
 
