@@ -13,6 +13,7 @@ import manager.TaskManager;
 import model.Task;
 import model.exception.ManagerIntersectionException;
 import model.exception.ManagerValidateException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -72,8 +73,8 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
                 }
                 break;
             default:
-                response = new Response(405,  gson.toJson(constructResponse(false, 405,
-                                "Метод не поддерживается. Доступны: GET, POST, DELETE, PUT")));
+                response = new Response(405, gson.toJson(constructResponse(false, 405,
+                        "Метод не поддерживается. Доступны: GET, POST, DELETE, PUT")));
         }
 
         Headers headers2 = exchange.getResponseHeaders();
@@ -109,18 +110,14 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
     }
 
     private Response updateTask(String requestBody) {
-        if (requestBody.isEmpty()) {
-            return new Response(400, "Тело запроса не должно быть пустым.");
-        } else {
-            try {
-                Task task = gson.fromJson(requestBody, Task.class);
-                int taskId = task.getId();
-                taskManager.updateTask(taskId, task);
-
-                return new Response(200, gson.toJson(taskManager.getTask(taskId)));
-            } catch (ManagerValidateException e) {
-                return new Response(404, e.getMessage());
-            }
+        try {
+            Task task = gson.fromJson(requestBody, Task.class);
+            int taskId = task.getId();
+            taskManager.updateTask(taskId, task);
+            return new Response(200, gson.toJson(taskManager.getTask(taskId)));
+        } catch (ManagerValidateException e) {
+            return new Response(404, gson.toJson(new Responses(false, 404, List.of(
+                    new PlatformResponse(e.getMessage())))));
         }
     }
 
