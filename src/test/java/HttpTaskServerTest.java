@@ -141,7 +141,7 @@ public class HttpTaskServerTest {
 
         int deleteStatusCode = deleteTaskRequest.deleteTaskById(2);
 
-        assertThat(deleteStatusCode).isEqualTo(400);
+        assertThat(deleteStatusCode).isEqualTo(404);
     }
 
     @Test

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class HandlerHelper {
     public String getJsonError(String requestBody, String jsonSchema) throws IOException {
@@ -66,5 +67,15 @@ public class HandlerHelper {
 
     public boolean isTotalDelete(HttpExchange exchange) {
         return exchange.getRequestURI().getQuery() == null;
+    }
+
+    public boolean isCorrectPath(HttpExchange exchange, String[] regulars) {
+        String path = exchange.getRequestURI().getPath();
+        for (String regular : regulars) {
+            if (Pattern.matches(regular, path)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

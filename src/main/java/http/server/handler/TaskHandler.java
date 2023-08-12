@@ -5,31 +5,25 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import http.server.response.Responses;
 import http.server.adapter.InstantAdapter;
-import http.server.response.PlatformResponse;
 import http.server.response.Response;
 import manager.TaskManager;
 import model.Task;
 import model.exception.ManagerIntersectionException;
 import model.exception.ManagerValidateException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.List;
 import java.util.OptionalInt;
-import java.util.regex.Pattern;
 
 public class TaskHandler extends HandlerHelper implements HttpHandler {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private static final String CREATE_SCHEMA = "/create_task_schema.json";
     private static final String UPDATE_SCHEMA = "/update_task_schema.json";
-    final String PATH_WITH_ID = "^/tasks/task/\\?id=\\d+$";
-    final String PATH_WITHOUT_ID = "^/tasks/task/?$";
+    String[] paths = {"^/tasks/task/\\?id=\\d+$", "^/tasks/task/?$"};
     private final TaskManager taskManager;
     private final Gson gson;
 
@@ -49,7 +43,7 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
 
         InputStream inputStream = exchange.getRequestBody();
         String requestBody = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
-        if (isCorrectPath(exchange)) {
+        if (isCorrectPath(exchange, paths)) {
             switch (method) {
                 case "POST":
                     if (validateJson(requestBody, CREATE_SCHEMA)) {
@@ -116,8 +110,7 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
             Task createdTask = getCreatedTask();
             return new Response(201, gson.toJson(createdTask));
         } catch (ManagerIntersectionException e) {
-            return new Response(400, gson.toJson(new Responses(
-                    false, 400, List.of(new PlatformResponse(e.getMessage())))));
+            return new Response(400, gson.toJson(constructResponse(false, 405, e.getMessage())));
         }
     }
 
@@ -128,8 +121,7 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
             taskManager.updateTask(taskId, task);
             return new Response(200, gson.toJson(taskManager.getTask(taskId)));
         } catch (ManagerValidateException e) {
-            return new Response(404, gson.toJson(new Responses(false, 404, List.of(
-                    new PlatformResponse(e.getMessage())))));
+            return new Response(404, gson.toJson(constructResponse(false, 405, e.getMessage())));
         }
     }
 
@@ -137,8 +129,8 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
         Task task = taskManager.getTaskById(id);
 
         if (task == null) {
-            return new Response(404, gson.toJson(new Responses(false, 404, List.of(
-                    new PlatformResponse(String.format("Задача с id = %d не найдена.", id))))));
+            return new Response(404, gson.toJson(constructResponse(
+                    false, 404, String.format("Задача с id = %d не найдена.", id))));
         } else {
             return new Response(200, gson.toJson(task));
         }
@@ -148,23 +140,18 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
         Task task = taskManager.getTask(id);
 
         if (task == null) {
-            return new Response(404, gson.toJson(new Responses(false, 404, List.of(
-                    new PlatformResponse(String.format("Задача с id = %d не найдена.", id))))));
+            return new Response(404, gson.toJson(constructResponse(
+                    false, 404, String.format("Задача с id = %d не найдена.", id))));
         } else {
             taskManager.removeTaskById(id);
-            return new Response(200, gson.toJson(new Responses(true, 200, List.of(
-                    new PlatformResponse(String.format("Задача с id = %d удалена.", id))))));
+            return new Response(200, gson.toJson(constructResponse(
+                    true, 200, String.format("Задача с id = %d удалена.", id))));
         }
     }
 
     private Response deleteAllTasks() {
         taskManager.removeAllTasks();
-        return new Response(200, gson.toJson(new Responses(true, 200, List.of(
-                new PlatformResponse("Все задачи удалены.")))));
-    }
-
-    private boolean isCorrectPath(HttpExchange exchange) {
-        String path = exchange.getRequestURI().getPath();
-        return Pattern.matches(PATH_WITHOUT_ID, path) || Pattern.matches(PATH_WITH_ID, path);
+        return new Response(200, gson.toJson(constructResponse(
+                true, 200, "Все задачи удалены.")));
     }
 }

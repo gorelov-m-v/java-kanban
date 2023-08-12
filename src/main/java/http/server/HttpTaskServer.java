@@ -20,10 +20,6 @@ public class HttpTaskServer {
                     "test.csv");
     TaskManager taskManager = Managers.getDefaultTaskManager();
 
-
-    public static void main(String[] args) throws IOException {
-        HttpTaskServer httpTaskServer = new HttpTaskServer();
-    }
     public HttpTaskServer() throws IOException {
         this.httpServer = HttpServer.create();
         this.httpServer.bind(new InetSocketAddress(PORT), 0);
