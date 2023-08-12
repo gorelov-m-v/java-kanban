@@ -2,16 +2,16 @@ package http.server.response;
 
 import java.util.List;
 
-public class Errors {
+public class Responses {
 
     private boolean success;
     private int code;
-    private List<PlatformError> errors;
+    private List<PlatformResponse> messages;
 
-    public Errors(boolean success, int code, List<PlatformError> errors) {
+    public Responses(boolean success, int code, List<PlatformResponse> messages) {
         this.success = success;
         this.code = code;
-        this.errors = errors;
+        this.messages = messages;
     }
 
     public boolean isSuccess() {
@@ -30,12 +30,12 @@ public class Errors {
         this.code = code;
     }
 
-    public List<PlatformError> getErrors() {
-        return errors;
+    public List<PlatformResponse> getErrors() {
+        return messages;
     }
 
-    public void setErrors(List<PlatformError> errors) {
-        this.errors = errors;
+    public void setErrors(List<PlatformResponse> errors) {
+        this.messages = errors;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class Errors {
         return "Errors{" +
                 "success=" + success +
                 ", code=" + code +
-                ", errors=" + errors +
+                ", errors=" + messages +
                 '}';
     }
 }

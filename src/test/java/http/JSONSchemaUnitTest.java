@@ -15,8 +15,8 @@ import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
 import http.server.handler.TaskHandler;
-import http.server.response.Errors;
-import http.server.response.PlatformError;
+import http.server.response.Responses;
+import http.server.response.PlatformResponse;
 import http.task.create.CreateTaskDataSet;
 import org.junit.jupiter.api.*;
 public class JSONSchemaUnitTest {
@@ -47,14 +47,14 @@ public class JSONSchemaUnitTest {
             // Набор ошибок
             Set<ValidationMessage> errors = jsonSchema.validate(jsonNode);
 
-            List<PlatformError> platformErrors = new ArrayList<>();
+            List<PlatformResponse> platformResponses = new ArrayList<>();
             errors.stream().forEach(error -> {
-               platformErrors.add(new PlatformError(error.toString().substring(2)));
+               platformResponses.add(new PlatformResponse(error.toString().substring(2)));
             });
 
-            Errors err = null;
-            if (!platformErrors.isEmpty()) {
-                err = new Errors(false, 400,platformErrors);
+            Responses err = null;
+            if (!platformResponses.isEmpty()) {
+                err = new Responses(false, 400, platformResponses);
             }
 
             String json = gson.toJson(err);

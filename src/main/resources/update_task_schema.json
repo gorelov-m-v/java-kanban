@@ -1,9 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Creating Task request schema",
-  "description": "Схема запроса создания задачи.",
+  "title": "Updating Task request schema",
+  "description": "Схема запроса обновления информации о задаче",
   "type": "object",
   "properties": {
+    "id": {
+      "description": "id задачи.",
+      "minimum": 0,
+      "exclusiveMinimum": true
+    },
     "title": {
       "description": "Название задачи.",
       "type": "string"
@@ -11,6 +16,11 @@
     "description": {
       "description": "Описание задачи.",
       "type": "string"
+    },
+    "status": {
+      "description": "Cтатус задачи",
+      "type": "string",
+      "enum": ["NEW", "IN_PROGRESS", "DONE"]
     },
     "startTime": {
       "description": "Дата начала работы над задачей, timestamp.",
@@ -23,5 +33,5 @@
       "exclusiveMinimum": true
     }
   },
-  "required": ["title", "description", "startTime", "duration"]
+  "required": ["id", "title", "description", "status", "startTime", "duration"]
 }

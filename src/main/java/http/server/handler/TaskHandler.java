@@ -5,9 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import http.server.response.Errors;
+import http.server.response.Responses;
 import http.server.adapter.InstantAdapter;
-import http.server.response.PlatformError;
+import http.server.response.PlatformResponse;
 import http.server.response.Response;
 import manager.TaskManager;
 import model.Task;
@@ -24,7 +24,8 @@ import java.util.OptionalInt;
 
 public class TaskHandler extends HandlerHelper implements HttpHandler {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
-    private static final String SCHEMA = "/create_task_schema.json";
+    private static final String CREATE_SCHEMA = "/create_task_schema.json";
+    private static final String UPDATE_SCHEMA = "/update_task_schema.json";
     private final TaskManager taskManager;
     private final Gson gson;
 
@@ -47,14 +48,18 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
 
         switch (method) {
             case "POST":
-                if (validateJson(requestBody, SCHEMA)) {
+                if (validateJson(requestBody, CREATE_SCHEMA)) {
                     response = createTask(requestBody);
                 } else {
-                    response = new Response(400, getJsonError(requestBody, SCHEMA));
+                    response = new Response(400, getJsonError(requestBody, CREATE_SCHEMA));
                 }
                 break;
             case "PUT":
-                response = updateTask(requestBody);
+                if (validateJson(requestBody, UPDATE_SCHEMA)) {
+                    response = updateTask(requestBody);
+                } else {
+                    response = new Response(400, getJsonError(requestBody, UPDATE_SCHEMA));
+                }
                 break;
             case "GET":
                 response = getTask(getIdFromPath(exchange));
@@ -67,8 +72,8 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
                 }
                 break;
             default:
-                response = new Response(405,  gson.toJson(
-                        constructError(405,"Метод не поддерживается. Доступны: GET, POST, DELETE, PUT")));
+                response = new Response(405,  gson.toJson(constructResponse(false, 405,
+                                "Метод не поддерживается. Доступны: GET, POST, DELETE, PUT")));
         }
 
         Headers headers2 = exchange.getResponseHeaders();
@@ -98,8 +103,8 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
             Task createdTask = getCreatedTask();
             return new Response(201, gson.toJson(createdTask));
         } catch (ManagerIntersectionException e) {
-            return new Response(400, gson.toJson(new Errors(
-                    false, 400, List.of(new PlatformError(e.getMessage())))));
+            return new Response(400, gson.toJson(new Responses(
+                    false, 400, List.of(new PlatformResponse(e.getMessage())))));
         }
     }
 
@@ -123,7 +128,8 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
         Task task = taskManager.getTaskById(id);
 
         if (task == null) {
-            return new Response(404, String.format("Задача с id = %d не найдена.", id));
+            return new Response(404, gson.toJson(new Responses(false, 404, List.of(
+                    new PlatformResponse(String.format("Задача с id = %d не найдена.", id))))));
         } else {
             return new Response(200, gson.toJson(task));
         }
@@ -133,15 +139,18 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
         Task task = taskManager.getTask(id);
 
         if (task == null) {
-            return new Response(400, "Задача, которую вы хотите удалить не существует.");
+            return new Response(404, gson.toJson(new Responses(false, 404, List.of(
+                    new PlatformResponse(String.format("Задача с id = %d не найдена.", id))))));
         } else {
             taskManager.removeTaskById(id);
-            return new Response(200, String.format("Задача с id = %d удалена.", id));
+            return new Response(200, gson.toJson(new Responses(true, 200, List.of(
+                    new PlatformResponse(String.format("Задача с id = %d удалена.", id))))));
         }
     }
 
     private Response deleteAllTasks() {
         taskManager.removeAllTasks();
-        return new Response(200, "Все задачи удалены.");
+        return new Response(200, gson.toJson(new Responses(true, 200, List.of(
+                new PlatformResponse("Все задачи удалены.")))));
     }
 }
