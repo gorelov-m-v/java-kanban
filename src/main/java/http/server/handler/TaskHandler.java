@@ -22,11 +22,14 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.OptionalInt;
+import java.util.regex.Pattern;
 
 public class TaskHandler extends HandlerHelper implements HttpHandler {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private static final String CREATE_SCHEMA = "/create_task_schema.json";
     private static final String UPDATE_SCHEMA = "/update_task_schema.json";
+    final String PATH_WITH_ID = "^/tasks/task/\\?id=\\d+$";
+    final String PATH_WITHOUT_ID = "^/tasks/task/?$";
     private final TaskManager taskManager;
     private final Gson gson;
 
@@ -46,35 +49,44 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
 
         InputStream inputStream = exchange.getRequestBody();
         String requestBody = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
-
-        switch (method) {
-            case "POST":
-                if (validateJson(requestBody, CREATE_SCHEMA)) {
-                    response = createTask(requestBody);
-                } else {
-                    response = new Response(400, getJsonError(requestBody, CREATE_SCHEMA));
-                }
-                break;
-            case "PUT":
-                if (validateJson(requestBody, UPDATE_SCHEMA)) {
-                    response = updateTask(requestBody);
-                } else {
-                    response = new Response(400, getJsonError(requestBody, UPDATE_SCHEMA));
-                }
-                break;
-            case "GET":
-                response = getTask(getIdFromPath(exchange));
-                break;
-            case "DELETE":
-                if (isTotalDelete(exchange)) {
-                    response = deleteAllTasks();
-                } else {
-                    response = deleteTask(getIdFromPath(exchange));
-                }
-                break;
-            default:
-                response = new Response(405, gson.toJson(constructResponse(false, 405,
-                        "Метод не поддерживается. Доступны: GET, POST, DELETE, PUT")));
+        if (isCorrectPath(exchange)) {
+            switch (method) {
+                case "POST":
+                    if (validateJson(requestBody, CREATE_SCHEMA)) {
+                        response = createTask(requestBody);
+                    } else {
+                        response = new Response(400, getJsonError(requestBody, CREATE_SCHEMA));
+                    }
+                    break;
+                case "PUT":
+                    if (validateJson(requestBody, UPDATE_SCHEMA)) {
+                        response = updateTask(requestBody);
+                    } else {
+                        response = new Response(400, getJsonError(requestBody, UPDATE_SCHEMA));
+                    }
+                    break;
+                case "GET":
+                    if (exchange.getRequestURI().getQuery() != null) {
+                        response = getTask(getIdFromPath(exchange));
+                    } else {
+                        response = new Response(400, gson.toJson(constructResponse(false, 400,
+                                "Данный эндпоинт не реализован.")));
+                    }
+                    break;
+                case "DELETE":
+                    if (isTotalDelete(exchange)) {
+                        response = deleteAllTasks();
+                    } else {
+                        response = deleteTask(getIdFromPath(exchange));
+                    }
+                    break;
+                default:
+                    response = new Response(405, gson.toJson(constructResponse(false, 405,
+                            "Метод не поддерживается. Доступны: GET, POST, DELETE, PUT")));
+            }
+        } else {
+            response = new Response(405, gson.toJson(constructResponse(false, 405,
+                    "Данный эндпоинт не реализован.")));
         }
 
         Headers headers2 = exchange.getResponseHeaders();
@@ -149,5 +161,10 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
         taskManager.removeAllTasks();
         return new Response(200, gson.toJson(new Responses(true, 200, List.of(
                 new PlatformResponse("Все задачи удалены.")))));
+    }
+
+    private boolean isCorrectPath(HttpExchange exchange) {
+        String path = exchange.getRequestURI().getPath();
+        return Pattern.matches(PATH_WITHOUT_ID, path) || Pattern.matches(PATH_WITH_ID, path);
     }
 }

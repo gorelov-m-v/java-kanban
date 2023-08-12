@@ -60,7 +60,7 @@ public class HandlerHelper {
                 new PlatformResponse(message)));
     }
 
-    public int getIdFromPath(HttpExchange exchange) {
+    public Integer getIdFromPath(HttpExchange exchange) {
         return Integer.parseInt(exchange.getRequestURI().getQuery().split("=")[1]);
     }
 
