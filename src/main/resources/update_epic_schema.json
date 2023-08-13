@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Updating Epic request schema",
+  "description": "Схема запроса обновления информации об эпике",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "id эпика.",
+      "minimum": 0,
+      "exclusiveMinimum": true
+    },
+    "title": {
+      "description": "Название эпика.",
+      "type": "string"
+    },
+    "description": {
+      "description": "Описание эпика.",
+      "type": "string"
+    }
+  },
+  "required": ["id", "title", "description"]
+}

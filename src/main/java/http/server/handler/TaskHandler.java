@@ -103,7 +103,6 @@ public class TaskHandler extends HandlerHelper implements HttpHandler {
     }
 
     public Response createTask(String body) {
-
         try {
             Task taskData = gson.fromJson(body, Task.class);
             taskManager.createTask(taskData);

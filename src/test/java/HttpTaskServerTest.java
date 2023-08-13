@@ -253,7 +253,7 @@ public class HttpTaskServerTest {
 
         int deleteStatusCode = deleteEpicRequest.deleteEpicById(2);
 
-        assertThat(deleteStatusCode).isEqualTo(400);
+        assertThat(deleteStatusCode).isEqualTo(404);
     }
 
     @Test
