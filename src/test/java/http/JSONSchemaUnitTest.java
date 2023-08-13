@@ -17,7 +17,7 @@ import com.networknt.schema.ValidationMessage;
 import http.server.handler.TaskHandler;
 import http.server.response.Responses;
 import http.server.response.PlatformResponse;
-import http.task.create.CreateTaskDataSet;
+import http.model.task.create.CreateTaskDataSet;
 import org.junit.jupiter.api.*;
 public class JSONSchemaUnitTest {
 
