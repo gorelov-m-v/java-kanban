@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Updating Subtask request schema",
+  "description": "Схема запроса обновления информации о подзадаче",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "id задачи.",
+      "minimum": 0,
+      "exclusiveMinimum": true
+    },
+    "status": {
+      "description": "Cтатус задачи",
+      "type": "string",
+      "enum": ["NEW", "IN_PROGRESS", "DONE"]
+    },
+    "title": {
+      "description": "Название подзадачи.",
+      "type": "string"
+    },
+    "description": {
+      "description": "Описание подзадачи.",
+      "type": "string"
+    },
+    "startTime": {
+      "description": "Дата начала работы над подзадачей, timestamp.",
+      "type": "string"
+    },
+    "duration": {
+      "description": "Продолжительность работы над подзадачей, в минутах.",
+      "type": "integer",
+      "minimum": 0,
+      "exclusiveMinimum": true
+    }
+  },
+  "required": ["id", "status", "title", "description", "startTime", "duration"]
+}

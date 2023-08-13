@@ -21,12 +21,15 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.OptionalInt;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class SubtaskHandler implements HttpHandler {
+public class SubtaskHandler extends HandlerHelper implements HttpHandler {
 
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+    private static final String CREATE_SCHEMA = "/create_subtask_schema.json";
+    private static final String UPDATE_SCHEMA = "/update_subtask_schema.json";
+    String[] paths = {"^/tasks/subtask/epic/\\?id=\\d+$", "^/tasks/subtask/?$",
+            "^/tasks/subtask/\\?id=\\d+$", "^/tasks/subtask/epic/?$"};
     private final TaskManager taskManager;
     private final Gson gson;
 
@@ -47,30 +50,44 @@ public class SubtaskHandler implements HttpHandler {
         InputStream inputStream = exchange.getRequestBody();
         String requestBody = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
 
-        switch (method) {
-            case "POST":
-                response = createSubtask(exchange, requestBody);
-                break;
-            case "PUT":
-                response = updateSubtask(requestBody);
-                break;
-            case "GET":
-                if (exchange.getRequestURI().getPath().equals("/tasks/subtask/epic/")) {
-                    response = getEpicSubtasks(exchange);
-                } else {
-                    response = getSubtask(getIdFromPath(exchange));
-                }
-                break;
-            case "DELETE":
-                if (isTotalDelete(exchange)) {
-                    response = deleteAllSubtasks();
-                } else {
-                    response = deleteSubtask(getIdFromPath(exchange));
-                }
-                break;
-            default:
-                response = new Response(405, "Метод не поддерживается. Доступны: GET, POST, DELETE");
-        }
+         if (isCorrectPath(exchange, paths)) {
+             switch (method) {
+                 case "POST":
+                     if (validateJson(requestBody, CREATE_SCHEMA)) {
+                         response = createSubtask(exchange, requestBody);
+                     } else {
+                         response = new Response(400, getJsonError(requestBody, CREATE_SCHEMA));
+                     }
+                     break;
+                 case "PUT":
+                     if (validateJson(requestBody, UPDATE_SCHEMA)) {
+                         response = updateSubtask(requestBody);
+                     } else {
+                         response = new Response(400, getJsonError(requestBody, CREATE_SCHEMA));
+                     }
+                     break;
+                 case "GET":
+                     if (exchange.getRequestURI().getPath().equals("/tasks/subtask/epic/")) {
+                         response = getEpicSubtasks(exchange);
+                     } else {
+                         response = getSubtask(getIdFromPath(exchange));
+                     }
+                     break;
+                 case "DELETE":
+                     if (isTotalDelete(exchange)) {
+                         response = deleteAllSubtasks();
+                     } else {
+                         response = deleteSubtask(getIdFromPath(exchange));
+                     }
+                     break;
+                 default:
+                     response = new Response(405, gson.toJson(constructResponse(false, 405,
+                             "Метод не поддерживается. Доступны: GET, POST, DELETE, PUT")));
+             }
+         } else {
+             response = new Response(405, gson.toJson(constructResponse(false, 405,
+                     "Данный эндпоинт не реализован.")));
+         }
 
         Headers headers2 = exchange.getResponseHeaders();
         headers2.set("Content-Type", "application/json");
@@ -84,23 +101,6 @@ public class SubtaskHandler implements HttpHandler {
 
     }
 
-    private boolean isTotalDelete(HttpExchange exchange) {
-        return exchange.getRequestURI().getQuery() == null;
-    }
-
-    private int getIdFromPath(HttpExchange exchange) {
-        return Integer.parseInt(exchange.getRequestURI().getQuery().split("=")[1]);
-    }
-
-    private boolean isUpdate(String requestBody) {
-        return requestBody.contains("\"id\": ");
-    }
-
-    private boolean isEpicSubtask(HttpExchange exchange) {
-        String requestPath = exchange.getRequestURI().getPath();
-        return Pattern.matches("^/tasks/subtask/epic/\\?id=\\d+$", requestPath);
-    }
-
     private Subtask getCreatedSubtask() {
         OptionalInt newSubtaskId = taskManager.getAllSubtasks().stream()
                 .map(Task::getId)
@@ -110,9 +110,6 @@ public class SubtaskHandler implements HttpHandler {
     }
 
     private Response createSubtask(HttpExchange exchange, String requestBody) {
-        if (requestBody.isEmpty()) {
-            return new Response(400, "Тело запроса не должно быть пустым.");
-        } else {
             try {
                 Subtask subtaskData = gson.fromJson(requestBody, Subtask.class);
                 int epicId = getIdFromPath(exchange);
@@ -121,15 +118,12 @@ public class SubtaskHandler implements HttpHandler {
                 Subtask createdSubtask = getCreatedSubtask();
                 return new Response(201, gson.toJson(createdSubtask));
             } catch (ManagerIntersectionException e) {
-                return new Response(400, e.getMessage());
+                return new Response(400, gson.toJson(constructResponse(false, 405, e.getMessage())));
             }
-        }
+
     }
 
     private Response updateSubtask(String requestBody) {
-        if (requestBody.isEmpty()) {
-            return new Response(400, "Тело запроса не должно быть пустым.");
-        } else {
             try {
                 Subtask subtaskData = gson.fromJson(requestBody, Subtask.class);
                 int subtaskId = subtaskData.getId();
@@ -138,16 +132,16 @@ public class SubtaskHandler implements HttpHandler {
                 Subtask updatedSubtask = taskManager.getSubtask(subtaskId);
                 return new Response(201, gson.toJson(updatedSubtask));
             } catch (ManagerIntersectionException |ManagerValidateException e) {
-                return new Response(400, e.getMessage());
+                return new Response(400, gson.toJson(constructResponse(false, 405, e.getMessage())));
             }
-        }
     }
 
     private Response getSubtask(int id) {
         Subtask subtask = taskManager.getSubtaskById(id);
 
         if (subtask == null) {
-            return new Response(404, String.format("Подзадача с id = %d не найдена.", id));
+            return new Response(404, gson.toJson(constructResponse(
+                    false, 404, String.format("Подзадача с id = %d не найдена.", id))));
         } else {
             return new Response(200, gson.toJson(subtask));
         }
@@ -175,10 +169,12 @@ public class SubtaskHandler implements HttpHandler {
         Subtask subtask = taskManager.getSubtaskById(id);
 
         if (subtask == null) {
-            return new Response(404, String.format("Подзадача с id = %d не найдена.", id));
+            return new Response(404, gson.toJson(constructResponse(
+                    false, 404, String.format("Подзадача с id = %d не найдена.", id))));
         } else {
             taskManager.removeSubtaskById(id);
-            return new Response(200, String.format("Подзадача с id = %d удалена.", id));
+            return new Response(200, gson.toJson(constructResponse(
+                    true, 200, String.format("Подзадача с id = %d удалена.", id))));
         }
     }
 }
